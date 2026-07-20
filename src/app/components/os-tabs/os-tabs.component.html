@@ -4,6 +4,7 @@
       type="button"
       role="tab"
       [class.is-active]="os() === opt.id && !opt.soon"
+      [class.is-detected]="os() === opt.id && opt.soon"
       [class.is-soon]="!!opt.soon"
       [disabled]="!!opt.soon"
       [title]="opt.soon ? 'Coming soon' : opt.label"

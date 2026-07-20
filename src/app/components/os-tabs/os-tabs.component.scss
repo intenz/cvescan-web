@@ -18,6 +18,11 @@
       font-weight: 600;
     }
 
+    &.is-detected {
+      border-color: var(--cves-green);
+      color: var(--cves-green);
+    }
+
     &.is-soon,
     &:disabled {
       cursor: not-allowed;

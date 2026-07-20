@@ -10,6 +10,10 @@ import { CveSidebarComponent } from '../../components/cve-sidebar/cve-sidebar.co
 import { SelectionBarComponent } from '../../components/selection-bar/selection-bar.component';
 import { CopyrightComponent } from '../../components/copyright/copyright.component';
 import { SeoCrawlComponent } from '../../components/seo-crawl/seo-crawl.component';
+import {
+  detectBrowserOs,
+  isScanOsAvailable,
+} from '../../core/detect-browser-os';
 import { ScanStateService } from '../../core/scan-state.service';
 import { ApiService } from '../../core/api.service';
 import { SeoService } from '../../core/seo.service';
@@ -52,7 +56,14 @@ export class ScanPageComponent implements OnInit {
       jsonLd: [softwareApplicationJsonLd(), howToJsonLd()],
     });
     if (!isPlatformBrowser(this.platformId)) return;
-    this.api.loadCommand(this.state.mode(), this.state.os());
+
+    const detectedOs = detectBrowserOs();
+    this.state.os.set(detectedOs);
+    if (isScanOsAvailable(detectedOs)) {
+      this.state.osPicked.set(true);
+    }
+
+    this.api.loadCommand(this.state.mode(), detectedOs);
     this.api.loadCatalog();
   }
 

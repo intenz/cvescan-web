@@ -1,4 +1,5 @@
 import { Component, inject } from '@angular/core';
+import { SOON_SCAN_OS } from '../../core/detect-browser-os';
 import type { ScanOs } from '../../core/models';
 import { ScanStateService } from '../../core/scan-state.service';
 import { ApiService } from '../../core/api.service';
@@ -18,8 +19,8 @@ export class OsTabsComponent {
     { id: 'macos', label: 'Mac OS' },
     { id: 'linux', label: 'Linux' },
     { id: 'windows', label: 'Windows' },
-    { id: 'iphone', label: 'iPhone', soon: true },
-    { id: 'android', label: 'Android', soon: true },
+    { id: 'iphone', label: 'iPhone', soon: SOON_SCAN_OS.has('iphone') },
+    { id: 'android', label: 'Android', soon: SOON_SCAN_OS.has('android') },
   ];
 
   select(os: ScanOs, soon?: boolean): void {
