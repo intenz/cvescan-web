@@ -16,6 +16,8 @@ export class ScanStateService {
   readonly uploaded = signal(false);
   readonly cves = signal<CveItem[]>(EXAMPLE_CVES);
   readonly isExample = signal(true);
+  /** Total rows in catalog (server-side). For scan results = filtered length. */
+  readonly catalogTotal = signal(0);
   readonly activeCveId = signal<string | null>(null);
   readonly selectedIds = signal<Set<string>>(new Set());
   readonly severityFilter = signal<Severity | 'ALL'>('ALL');
@@ -28,13 +30,19 @@ export class ScanStateService {
   readonly stripCollapsed = signal(false);
   readonly sidebarOpen = signal(false);
 
+  /** When true, pagination is fetched from API (catalog preview). */
+  readonly serverPaging = computed(() => this.isExample());
+
   readonly activeCve = computed(() => {
     const id = this.activeCveId();
     return this.cves().find((c) => c.cve_id === id) ?? null;
   });
 
-  /** Severity filter + newest published first */
+  /** For scan results: filter + sort client-side. Catalog: already one server page. */
   readonly filteredCves = computed(() => {
+    if (this.serverPaging()) {
+      return this.cves();
+    }
     const filter = this.severityFilter();
     const list =
       filter === 'ALL'
@@ -45,12 +53,19 @@ export class ScanStateService {
     );
   });
 
+  readonly totalCount = computed(() =>
+    this.serverPaging() ? this.catalogTotal() : this.filteredCves().length,
+  );
+
   readonly totalPages = computed(() => {
-    const n = this.filteredCves().length;
+    const n = this.totalCount();
     return Math.max(1, Math.ceil(n / this.pageSize));
   });
 
   readonly pagedCves = computed(() => {
+    if (this.serverPaging()) {
+      return this.cves();
+    }
     const page = Math.min(this.page(), this.totalPages());
     const start = (page - 1) * this.pageSize;
     return this.filteredCves().slice(start, start + this.pageSize);
@@ -60,6 +75,7 @@ export class ScanStateService {
     const ids = this.selectedIds();
     return this.cves().filter((c) => ids.has(c.cve_id));
   });
+
   /** 1-based current step; completed steps are indices < currentStep */
   readonly wizardStep = computed(() => {
     if (!this.osPicked()) return 1;
@@ -87,11 +103,21 @@ export class ScanStateService {
     this.hint.set(hint);
   }
 
+  setCatalogPage(cves: CveItem[], total: number, page: number): void {
+    this.cves.set(cves);
+    this.catalogTotal.set(total);
+    this.isExample.set(true);
+    this.uploaded.set(false);
+    this.page.set(page);
+    this.selectedIds.set(new Set());
+    this.closeSidebar();
+  }
+
   setResults(cves: CveItem[], example = false): void {
     this.cves.set(cves);
     this.isExample.set(example);
-    // Catalog preview keeps uploaded=false; real scan sets uploaded=true
     this.uploaded.set(!example);
+    this.catalogTotal.set(example ? cves.length : 0);
     this.selectedIds.set(new Set());
     this.page.set(1);
     this.closeSidebar();
@@ -105,14 +131,6 @@ export class ScanStateService {
   setPage(page: number): void {
     const clamped = Math.min(Math.max(1, page), this.totalPages());
     this.page.set(clamped);
-  }
-
-  nextPage(): void {
-    this.setPage(this.page() + 1);
-  }
-
-  prevPage(): void {
-    this.setPage(this.page() - 1);
   }
 
   openCve(id: string): void {

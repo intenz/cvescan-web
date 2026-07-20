@@ -2,7 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, map, of, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
-import type { CveItem, ScanMode, ScanOs } from './models';
+import type { CveItem, ScanMode, ScanOs, Severity } from './models';
 import { ScanStateService } from './scan-state.service';
 
 interface CommandResponse {
@@ -12,6 +12,14 @@ interface CommandResponse {
 
 interface ScanResponse {
   cves: CveItem[];
+}
+
+interface CatalogResponse {
+  cves: CveItem[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -43,26 +51,59 @@ export class ApiService {
       .subscribe((res) => this.state.setCommand(res.command, res.hint));
   }
 
-  loadCatalog(): void {
+  loadCatalog(
+    page = this.state.page(),
+    severity: Severity | 'ALL' = this.state.severityFilter(),
+  ): void {
     this.state.loading.set(true);
     this.http
-      .get<ScanResponse>(`${this.base}/api/customer/catalog`, {
+      .get<CatalogResponse>(`${this.base}/api/customer/catalog`, {
+        params: {
+          page: String(page),
+          limit: String(this.state.pageSize),
+          severity,
+        },
         headers: this.headers(),
       })
       .pipe(
-        map((res) => res.cves ?? []),
-        catchError(() => of([] as CveItem[])),
+        catchError(() =>
+          of({
+            cves: [] as CveItem[],
+            total: 0,
+            page: 1,
+            limit: this.state.pageSize,
+            totalPages: 1,
+          }),
+        ),
         tap({
-          next: (cves) => {
-            if (cves.length) {
-              this.state.setResults(cves, true);
-            }
+          next: (res) => {
+            this.state.setCatalogPage(
+              res.cves ?? [],
+              res.total ?? 0,
+              res.page ?? page,
+            );
             this.state.loading.set(false);
           },
           error: () => this.state.loading.set(false),
         }),
       )
       .subscribe();
+  }
+
+  goPage(page: number): void {
+    const clamped = Math.min(Math.max(1, page), this.state.totalPages());
+    if (this.state.serverPaging()) {
+      this.loadCatalog(clamped);
+      return;
+    }
+    this.state.setPage(clamped);
+  }
+
+  setSeverity(filter: Severity | 'ALL'): void {
+    this.state.setSeverityFilter(filter);
+    if (this.state.isExample()) {
+      this.loadCatalog(1, filter);
+    }
   }
 
   uploadScan(file: File, mode: ScanMode, os: ScanOs): Observable<CveItem[]> {
