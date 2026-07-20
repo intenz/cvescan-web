@@ -4,22 +4,27 @@
     <span class="cves-header__sub">/ runtime scanner</span>
   </a>
 
-  <nav class="cves-header__nav" aria-label="Scan mode">
-    <button
-      type="button"
-      class="cves-header__nav-item"
-      [class.is-active]="mode() === 'local'"
-      (click)="setMode('local')"
-    >
-      Local Programs
-    </button>
-    <button type="button" class="cves-header__nav-item is-soon" disabled title="Coming soon">
-      Browser <span>soon</span>
-    </button>
-    <button type="button" class="cves-header__nav-item is-soon" disabled title="Coming soon">
-      Network <span>soon</span>
-    </button>
-  </nav>
+  <div class="cves-header__modes">
+    <nav class="cves-header__nav" aria-label="Scan mode">
+      @for (m of modes; track m.id) {
+        <button
+          type="button"
+          class="cves-header__nav-item"
+          [class.is-active]="mode() === m.id"
+          [class.is-soon]="!m.available"
+          [disabled]="!m.available"
+          [title]="m.description"
+          (click)="setMode(m.id)"
+        >
+          {{ m.label }}
+          @if (!m.available) {
+            <span>soon</span>
+          }
+        </button>
+      }
+    </nav>
+    <p class="cves-header__mode-desc">{{ activeMode().description }}</p>
+  </div>
 
   <div class="cves-header__right">
     <span class="cves-header__live"><i></i> NVD LIVE</span>

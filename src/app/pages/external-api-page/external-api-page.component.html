@@ -1,7 +1,8 @@
 <section class="cves-ext">
-  <h1>External API</h1>
+  <h1>External API — Commercial CPE → CVE Matching</h1>
   <p class="cves-ext__lead">
-    Commercial CPE → CVE matching for integrations. Documentation only on this page —
+    Commercial CPE to CVE matching API for integrations. Map software inventories and CPE
+    identifiers to NVD vulnerabilities with CVSS severity. Documentation only on this page —
     live calls are not enabled from the website UI.
   </p>
 
@@ -16,7 +17,7 @@
     <li>
       <code>POST /match</code> — body with <code>cpes</code> array or <code>products</code> list
     </li>
-    <li><code>GET /match?cpe=</code> — match a single CPE</li>
+    <li><code>GET /match?cpe=</code> — match a single CPE against known CVEs</li>
     <li><code>GET /cve/:cveId</code> — CVE details (+ Nuclei link when available)</li>
     <li><code>GET /health</code> — health check</li>
   </ul>
@@ -24,7 +25,7 @@
   <h2>Privacy</h2>
   <p>
     Client scan files from the web product are never stored. This API reads the shared vulnerability
-    catalog only.
+    catalog only — privacy-first CPE → CVE matching for production integrations.
   </p>
 
   <p class="cves-ext__note">
