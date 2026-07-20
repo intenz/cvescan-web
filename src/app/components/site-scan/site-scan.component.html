@@ -1,0 +1,26 @@
+<section class="cves-site">
+  <form class="cves-site__form" (submit)="$event.preventDefault(); submit()">
+    <label class="cves-site__label" for="cves-site-url">Website</label>
+    <div class="cves-site__row">
+      <input
+        id="cves-site-url"
+        type="url"
+        name="url"
+        placeholder="https://example.com"
+        autocomplete="url"
+        [ngModel]="url()"
+        (ngModelChange)="url.set($event)"
+        [disabled]="busy()"
+      />
+      <button type="submit" [disabled]="busy() || !url().trim()">
+        {{ busy() ? 'Scanning…' : 'Scan site' }}
+      </button>
+    </div>
+  </form>
+  <p class="cves-site__hint">
+    We probe public HTTP headers and HTML signals (Server, X-Powered-By, generator) — no login, no crawl of private pages.
+  </p>
+  @if (state.error(); as err) {
+    <p class="cves-site__error">{{ err }}</p>
+  }
+</section>

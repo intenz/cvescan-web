@@ -1,12 +1,20 @@
 <ol class="cves-wizard">
-  @for (step of steps; track step; let i = $index) {
+  @for (step of steps(); track step; let i = $index) {
     <li
       [class.is-done]="isDone(i)"
       [class.is-current]="isCurrent(i)"
     >
-      <span class="cves-wizard__num">
+      <span class="cves-wizard__num" aria-hidden="true">
         @if (isDone(i)) {
-          ✓
+          <svg viewBox="0 0 16 16" width="10" height="10" fill="none">
+            <path
+              d="M3.5 8.5 6.5 11.5 12.5 4.5"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
         } @else {
           {{ i + 1 }}
         }

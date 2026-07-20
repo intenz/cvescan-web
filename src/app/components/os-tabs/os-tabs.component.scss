@@ -4,6 +4,10 @@
   gap: 0.4rem;
 
   button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
     background: var(--cves-surface2);
     border: 1px solid var(--cves-border);
     color: var(--cves-text-muted);
@@ -16,6 +20,12 @@
       background: var(--cves-green);
       border-color: var(--cves-green);
       font-weight: 600;
+
+      .cves-os__badge.is-beta {
+        background: color-mix(in srgb, var(--cves-bg) 22%, transparent);
+        color: var(--cves-bg);
+        border-color: color-mix(in srgb, var(--cves-bg) 35%, transparent);
+      }
     }
 
     &.is-detected {
@@ -27,14 +37,65 @@
     &:disabled {
       cursor: not-allowed;
       opacity: 0.45;
+    }
 
-      span {
-        margin-left: 0.3rem;
-        font-size: 0.65rem;
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-        color: var(--cves-amber);
+    &.is-beta:hover,
+    &.is-beta:focus-visible {
+      .cves-os__tip {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(-50%) translateY(0);
       }
     }
+  }
+
+  &__badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.05rem 0.35rem;
+    border: 1px solid color-mix(in srgb, var(--cves-amber) 45%, transparent);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--cves-amber) 14%, transparent);
+    font-size: 0.6rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--cves-amber);
+    line-height: 1.2;
+
+    &.is-later {
+      color: var(--cves-text-dim);
+      border-color: var(--cves-border2);
+      background: color-mix(in srgb, var(--cves-border2) 35%, transparent);
+    }
+  }
+
+  &__tip {
+    position: absolute;
+    top: calc(100% + 0.45rem);
+    left: 50%;
+    z-index: 30;
+    min-width: 11rem;
+    max-width: 15rem;
+    padding: 0.45rem 0.6rem;
+    border: 1px solid var(--cves-border2);
+    border-radius: 4px;
+    background: var(--cves-surface);
+    color: var(--cves-text-muted);
+    font-size: 0.7rem;
+    font-weight: 400;
+    letter-spacing: normal;
+    line-height: 1.35;
+    text-align: left;
+    white-space: normal;
+    box-shadow: 0 6px 20px #00000040;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-50%) translateY(-2px);
+    transition:
+      opacity 0.15s ease,
+      visibility 0.15s ease,
+      transform 0.15s ease;
+    pointer-events: none;
   }
 }

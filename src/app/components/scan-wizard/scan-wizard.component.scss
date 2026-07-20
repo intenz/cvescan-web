@@ -42,6 +42,12 @@
     color: var(--cves-text-muted);
     font-weight: 600;
     font-size: 0.7rem;
+    line-height: 1;
+    flex-shrink: 0;
+
+    svg {
+      display: block;
+    }
   }
 
   &__arrow {

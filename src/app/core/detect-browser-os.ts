@@ -1,6 +1,9 @@
 import type { ScanOs } from './models';
 
-export const SOON_SCAN_OS = new Set<ScanOs>([]);
+export const SOON_SCAN_OS = new Set<ScanOs>(['android']);
+
+/** Available but experimental — shown with a beta badge. */
+export const BETA_SCAN_OS = new Set<ScanOs>(['iphone']);
 
 export function isScanOsAvailable(os: ScanOs): boolean {
   return !SOON_SCAN_OS.has(os);

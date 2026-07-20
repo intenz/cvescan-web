@@ -1,6 +1,8 @@
 <section class="cves-scan">
   <h1 class="cves-scan__title">{{ home.h1 }}</h1>
-  <p class="cves-scan__tagline">{{ home.tagline }}</p>
+  <p class="cves-scan__tagline">
+    {{ modeInfo(state.mode()).description }}
+  </p>
 
   <div class="cves-scan__strip" [class.is-collapsed]="state.stripCollapsed()">
     <div class="cves-scan__strip-head">
@@ -19,16 +21,31 @@
 
     <div class="cves-scan__strip-body" [class.is-collapsed]="state.stripCollapsed()">
       <div class="cves-scan__strip-body-inner">
-        <cves-os-tabs />
-        <cves-command-panel />
-        <cves-upload-zone />
+        @if (state.mode() === 'browser') {
+          <cves-site-scan />
+        } @else {
+          <cves-os-tabs />
+          <cves-command-panel />
+          <cves-upload-zone />
+        }
       </div>
     </div>
   </div>
 
   @if (state.isExample()) {
     <div class="cves-scan__banner">
-      ◈ Catalog preview ({{ state.totalCount() }} CVEs) — upload scan_results.txt to see matches for your system
+      @if (state.mode() === 'browser') {
+        ◈ Catalog preview ({{ state.totalCount() }} CVEs) — enter a website URL to probe stack signals
+      } @else {
+        ◈ Catalog preview ({{ state.totalCount() }} CVEs) — upload scan_results.txt to see matches for your system
+      }
+    </div>
+  } @else if (state.mode() === 'browser' && state.detectedStack().length) {
+    <div class="cves-scan__banner">
+      Detected: {{ detectedLabel() }}
+      @if (state.siteUrl()) {
+        · {{ state.siteUrl() }}
+      }
     </div>
   }
 

@@ -10,6 +10,7 @@ import { CveSidebarComponent } from '../../components/cve-sidebar/cve-sidebar.co
 import { SelectionBarComponent } from '../../components/selection-bar/selection-bar.component';
 import { CopyrightComponent } from '../../components/copyright/copyright.component';
 import { SeoCrawlComponent } from '../../components/seo-crawl/seo-crawl.component';
+import { SiteScanComponent } from '../../components/site-scan/site-scan.component';
 import {
   detectBrowserOs,
   isScanOsAvailable,
@@ -20,6 +21,7 @@ import { SeoService } from '../../core/seo.service';
 import {
   HOME_SEO,
   howToJsonLd,
+  modeInfo,
   softwareApplicationJsonLd,
 } from '../../core/seo-content';
 
@@ -31,6 +33,7 @@ import {
     OsTabsComponent,
     CommandPanelComponent,
     UploadZoneComponent,
+    SiteScanComponent,
     CveFiltersComponent,
     CveTableComponent,
     CveSidebarComponent,
@@ -47,6 +50,7 @@ export class ScanPageComponent implements OnInit {
   private readonly platformId = inject(PLATFORM_ID);
   readonly state = inject(ScanStateService);
   readonly home = HOME_SEO;
+  readonly modeInfo = modeInfo;
 
   ngOnInit(): void {
     this.seo.apply({
@@ -58,16 +62,22 @@ export class ScanPageComponent implements OnInit {
     if (!isPlatformBrowser(this.platformId)) return;
 
     const detectedOs = detectBrowserOs();
-    this.state.os.set(detectedOs);
-    if (isScanOsAvailable(detectedOs)) {
-      this.state.osPicked.set(true);
-    }
-
-    this.api.loadCommand(this.state.mode(), detectedOs);
+    const os = isScanOsAvailable(detectedOs) ? detectedOs : 'macos';
+    // Preselect OS for tabs/command, but do not mark wizard step 1 done
+    // until the user explicitly confirms by clicking an OS tab.
+    this.state.os.set(os);
+    this.api.loadCommand(this.state.mode(), os);
     this.api.loadCatalog();
   }
 
   today(): string {
     return new Date().toISOString().slice(0, 10);
+  }
+
+  detectedLabel(): string {
+    return this.state
+      .detectedStack()
+      .map((p) => (p.version ? `${p.name} ${p.version}` : p.name))
+      .join(' · ');
   }
 }

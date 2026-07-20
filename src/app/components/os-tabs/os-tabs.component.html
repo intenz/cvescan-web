@@ -1,18 +1,30 @@
 <div class="cves-os" role="tablist" aria-label="Operating system">
-  @for (opt of options; track opt.id) {
+  @for (opt of options(); track opt.id) {
     <button
       type="button"
       role="tab"
       [class.is-active]="os() === opt.id && !opt.soon"
       [class.is-detected]="os() === opt.id && opt.soon"
       [class.is-soon]="!!opt.soon"
+      [class.is-beta]="!!opt.beta"
       [disabled]="!!opt.soon"
-      [title]="opt.soon ? 'Coming soon' : opt.label"
+      [attr.aria-label]="
+        opt.later || opt.soon
+          ? opt.label + ' (coming later)'
+          : (opt.title ?? opt.label)
+      "
       (click)="select(opt.id, opt.soon)"
     >
       {{ opt.label }}
-      @if (opt.soon) {
-        <span>soon</span>
+      @if (opt.later) {
+        <span class="cves-os__badge is-later">later</span>
+      } @else if (opt.soon) {
+        <span class="cves-os__badge">soon</span>
+      } @else if (opt.beta) {
+        <span class="cves-os__badge is-beta">beta</span>
+      }
+      @if (opt.beta && opt.title) {
+        <span class="cves-os__tip" role="tooltip">{{ opt.title }}</span>
       }
     </button>
   }

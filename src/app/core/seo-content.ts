@@ -22,8 +22,8 @@ export const SCAN_MODES: ScanModeInfo[] = [
     id: 'browser',
     label: 'Browser',
     description:
-      'Scan the last week of browser history and flag vulnerable sites.',
-    available: false,
+      'Enter a website URL. We probe public headers/HTML for stack signals and match related CVEs.',
+    available: true,
   },
   {
     id: 'network',
@@ -128,7 +128,7 @@ export const FAQ_ITEMS: FaqItem[] = [
   {
     question: 'What are Browser and Network scan modes?',
     answer:
-      'Browser mode (coming soon) will scan roughly the last week of browser history and flag sites associated with known risks. Network mode (coming soon) will use nmap-style discovery to find exposed services and map them to related CVE risks. Today only Local Programs is available; the other modes are listed so you can see the roadmap.',
+      'Browser mode: enter a public website URL. CVEScan probes HTTP headers and HTML signals (Server, X-Powered-By, generator meta, common CMS fingerprints), then matches detected products to NVD CVEs. Network mode (coming soon) will use nmap-style discovery. Local Programs remains the installed-software scan, including iPhone (beta).',
   },
   {
     question: 'Do I need an account or API key to use the website scanner?',

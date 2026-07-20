@@ -1,8 +1,39 @@
-import { Component, inject } from '@angular/core';
-import { SOON_SCAN_OS } from '../../core/detect-browser-os';
+import { Component, computed, inject } from '@angular/core';
+import { BETA_SCAN_OS, SOON_SCAN_OS } from '../../core/detect-browser-os';
 import type { ScanOs } from '../../core/models';
 import { ScanStateService } from '../../core/scan-state.service';
 import { ApiService } from '../../core/api.service';
+
+type OsOption = {
+  id: ScanOs;
+  label: string;
+  soon?: boolean;
+  beta?: boolean;
+  later?: boolean;
+  title?: string;
+};
+
+const DESKTOP_OS: OsOption[] = [
+  { id: 'macos', label: 'Mac OS' },
+  { id: 'linux', label: 'Linux' },
+  { id: 'windows', label: 'Windows' },
+];
+
+const MOBILE_OS: OsOption[] = [
+  {
+    id: 'iphone',
+    label: 'iPhone',
+    soon: SOON_SCAN_OS.has('iphone'),
+    beta: BETA_SCAN_OS.has('iphone'),
+    title: 'Works only from a MacBook with iPhone connected by USB',
+  },
+  {
+    id: 'android',
+    label: 'Android',
+    soon: SOON_SCAN_OS.has('android'),
+    later: true,
+  },
+];
 
 @Component({
   selector: 'cves-os-tabs',
@@ -15,13 +46,10 @@ export class OsTabsComponent {
   private readonly api = inject(ApiService);
 
   readonly os = this.state.os;
-  readonly options: { id: ScanOs; label: string; soon?: boolean }[] = [
-    { id: 'macos', label: 'Mac OS' },
-    { id: 'linux', label: 'Linux' },
-    { id: 'windows', label: 'Windows' },
-    { id: 'iphone', label: 'iPhone', soon: SOON_SCAN_OS.has('iphone') },
-    { id: 'android', label: 'Android', soon: SOON_SCAN_OS.has('android') },
-  ];
+  /** iPhone / Android only in Local Programs. */
+  readonly options = computed(() =>
+    this.state.mode() === 'local' ? [...DESKTOP_OS, ...MOBILE_OS] : DESKTOP_OS,
+  );
 
   select(os: ScanOs, soon?: boolean): void {
     if (soon) return;

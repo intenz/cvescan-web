@@ -1,0 +1,72 @@
+.cves-site {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+
+  &__label {
+    font-size: 0.75rem;
+    color: var(--cves-text-muted);
+    letter-spacing: 0.03em;
+  }
+
+  &__row {
+    display: flex;
+    gap: 0.55rem;
+    align-items: stretch;
+  }
+
+  input {
+    flex: 1;
+    min-width: 0;
+    background: var(--cves-surface2);
+    border: 1px solid var(--cves-border);
+    border-radius: 6px;
+    color: var(--cves-text);
+    padding: 0.7rem 0.85rem;
+    font: inherit;
+
+    &:focus {
+      outline: none;
+      border-color: var(--cves-green);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+    }
+  }
+
+  button {
+    flex-shrink: 0;
+    background: var(--cves-green);
+    border: 1px solid var(--cves-green);
+    color: var(--cves-bg);
+    border-radius: 6px;
+    padding: 0.7rem 1rem;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  &__hint {
+    margin: 0;
+    color: var(--cves-text-muted);
+    font-size: 0.75rem;
+    line-height: 1.4;
+  }
+
+  &__error {
+    margin: 0;
+    color: var(--cves-amber);
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .cves-site__row {
+    flex-direction: column;
+  }
+}

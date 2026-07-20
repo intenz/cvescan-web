@@ -15,6 +15,9 @@ export class ScanStateService {
   readonly osPicked = signal(false);
   readonly commandCopied = signal(false);
   readonly uploaded = signal(false);
+  readonly siteEntered = signal(false);
+  readonly siteUrl = signal('');
+  readonly detectedStack = signal<Array<{ name: string; version?: string }>>([]);
   readonly cves = signal<CveItem[]>(EXAMPLE_CVES);
   readonly isExample = signal(true);
   /** Total rows in catalog (server-side). For scan results = filtered length. */
@@ -81,6 +84,12 @@ export class ScanStateService {
 
   /** 1-based current step; completed steps are indices < currentStep */
   readonly wizardStep = computed(() => {
+    if (this.mode() === 'browser') {
+      if (!this.siteEntered()) return 1;
+      if (!this.uploaded() && this.isExample()) return 2;
+      if (!this.uploaded()) return 2;
+      return 3;
+    }
     if (!this.osPicked()) return 1;
     if (!this.commandCopied()) return 2;
     if (!this.uploaded() && this.isExample()) return 3;
@@ -90,6 +99,34 @@ export class ScanStateService {
 
   setMode(mode: ScanMode): void {
     this.mode.set(mode);
+    this.error.set(null);
+    // Mobile OS tabs exist only in Local Programs.
+    if (mode !== 'local') {
+      const os = this.os();
+      if (os === 'iphone' || os === 'android') {
+        this.os.set('macos');
+      }
+    }
+    if (mode === 'browser') {
+      this.siteEntered.set(false);
+      this.siteUrl.set('');
+      this.detectedStack.set([]);
+      this.uploaded.set(false);
+    }
+  }
+
+  markSiteEntered(): void {
+    this.siteEntered.set(true);
+  }
+
+  setSiteResults(
+    cves: CveItem[],
+    url: string,
+    detected: Array<{ name: string; version?: string }>,
+  ): void {
+    this.siteUrl.set(url);
+    this.detectedStack.set(detected);
+    this.setResults(cves, false);
   }
 
   setOs(os: ScanOs): void {
