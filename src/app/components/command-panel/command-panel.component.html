@@ -3,5 +3,15 @@
     <code>{{ state.command() || 'Loading command…' }}</code>
     <button type="button" (click)="copy()">{{ copied ? 'copied' : 'copy' }}</button>
   </div>
-  <p class="cves-command__hint">↳ {{ state.hint() || 'Run the command, then upload the result file' }}</p>
+  <p class="cves-command__hint">
+    ↳ {{ state.hint() || 'Run the command, then upload the result file' }}
+    @if (state.mode() === 'network') {
+      <a
+        class="cves-command__link"
+        [href]="nmapDownloadUrl()"
+        target="_blank"
+        rel="noopener noreferrer"
+      >Download nmap</a>
+    }
+  </p>
 </section>

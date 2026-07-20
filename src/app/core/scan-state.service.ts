@@ -1,4 +1,5 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, PLATFORM_ID, computed, inject, signal } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import type { LiveFeedId, LiveFeedStatus } from './live-feeds';
 import {
   EXAMPLE_CVES,
@@ -7,9 +8,21 @@ import {
   type ScanOs,
   type Severity,
 } from './models';
+import { modeInfo } from './seo-content';
+
+const PREFS_KEY = 'cves-scan-prefs';
+const MODES: ScanMode[] = ['local', 'browser', 'network'];
+const OSES: ScanOs[] = ['macos', 'linux', 'windows', 'iphone', 'android'];
+
+type ScanPrefs = {
+  mode?: ScanMode;
+  os?: ScanOs;
+};
 
 @Injectable({ providedIn: 'root' })
 export class ScanStateService {
+  private readonly platformId = inject(PLATFORM_ID);
+
   readonly mode = signal<ScanMode>('local');
   readonly os = signal<ScanOs>('macos');
   readonly osPicked = signal(false);
@@ -97,6 +110,32 @@ export class ScanStateService {
     return 4;
   });
 
+  /** Restore last active mode/OS from localStorage. Returns what was restored. */
+  restorePrefs(): { mode: boolean; os: boolean } {
+    const restored = { mode: false, os: false };
+    if (!isPlatformBrowser(this.platformId)) return restored;
+    try {
+      const raw = localStorage.getItem(PREFS_KEY);
+      if (!raw) return restored;
+      const data = JSON.parse(raw) as ScanPrefs;
+      if (data.mode && MODES.includes(data.mode) && modeInfo(data.mode).available) {
+        this.mode.set(data.mode);
+        restored.mode = true;
+      }
+      if (data.os && OSES.includes(data.os)) {
+        let os = data.os;
+        if (this.mode() !== 'local' && (os === 'iphone' || os === 'android')) {
+          os = 'macos';
+        }
+        this.os.set(os);
+        restored.os = true;
+      }
+    } catch {
+      /* ignore bad prefs */
+    }
+    return restored;
+  }
+
   setMode(mode: ScanMode): void {
     this.mode.set(mode);
     this.error.set(null);
@@ -113,6 +152,7 @@ export class ScanStateService {
       this.detectedStack.set([]);
       this.uploaded.set(false);
     }
+    this.persistPrefs();
   }
 
   markSiteEntered(): void {
@@ -132,6 +172,16 @@ export class ScanStateService {
   setOs(os: ScanOs): void {
     this.os.set(os);
     this.osPicked.set(true);
+    this.persistPrefs();
+  }
+
+  private persistPrefs(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+    const payload: ScanPrefs = {
+      mode: this.mode(),
+      os: this.os(),
+    };
+    localStorage.setItem(PREFS_KEY, JSON.stringify(payload));
   }
 
   markCommandCopied(): void {

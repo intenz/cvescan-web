@@ -1,6 +1,11 @@
 <div class="cves-upload-wrap">
   <label class="cves-upload" [class.is-busy]="busy()">
-    <input type="file" accept=".txt,text/plain" (change)="onFile($event)" [disabled]="busy()" />
+    <input
+      type="file"
+      [accept]="accept()"
+      (change)="onFile($event)"
+      [disabled]="busy()"
+    />
     @if (busy()) {
       <span class="cves-upload__pulse" aria-hidden="true"></span>
       <span class="cves-upload__stage">
@@ -9,11 +14,17 @@
         }
       </span>
     } @else {
-      <span>Upload scan_results.txt</span>
+      <span>{{ label() }}</span>
     }
   </label>
   <p class="cves-upload__hint">
-    No client data stored. Upload an inventory file, get matched CVEs from NVD — your <code>scan_results.txt</code> is not retained after the scan.
+    @if (isNetwork()) {
+      No client data stored. Upload nmap XML (<code>-oX</code>), get matched CVEs from NVD — your
+      <code>scan_results.xml</code> is not retained after the scan.
+    } @else {
+      No client data stored. Upload an inventory file, get matched CVEs from NVD — your
+      <code>scan_results.txt</code> is not retained after the scan.
+    }
   </p>
   @if (state.error()) {
     <p class="cves-upload__error">{{ state.error() }}</p>

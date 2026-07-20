@@ -10,11 +10,16 @@ import { ScanStateService } from '../../core/scan-state.service';
 export class ScanWizardComponent {
   readonly state = inject(ScanStateService);
 
-  readonly steps = computed(() =>
-    this.state.mode() === 'browser'
-      ? ['Enter URL', 'Scan site', 'View results']
-      : ['Pick OS', 'Copy command', 'Upload .txt', 'View results'],
-  );
+  readonly steps = computed(() => {
+    const mode = this.state.mode();
+    if (mode === 'browser') {
+      return ['Enter URL', 'Scan site', 'View results'];
+    }
+    if (mode === 'network') {
+      return ['Pick OS', 'Copy command', 'Upload .xml', 'View results'];
+    }
+    return ['Pick OS', 'Copy command', 'Upload .txt', 'View results'];
+  });
 
   isDone(index: number): boolean {
     return this.state.wizardStep() > index + 1;

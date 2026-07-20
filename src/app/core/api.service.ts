@@ -280,6 +280,10 @@ export class ApiService {
       return browser[os];
     }
 
+    if (mode === 'network') {
+      return 'nmap -sV -oX scan_results.xml localhost';
+    }
+
     const local: Record<ScanOs, string> = {
       macos:
         "system_profiler SPSoftwareDataType SPApplicationsDataType | grep -E 'Version|System Version|Location' > scan_results.txt",
@@ -297,6 +301,9 @@ export class ApiService {
   private fallbackHint(mode: ScanMode, os: ScanOs): string {
     if (mode === 'browser') {
       return 'Quit browsers first if a DB is locked. Merges last 7 days from installed browsers → upload scan_results.txt';
+    }
+    if (mode === 'network') {
+      return 'Requires nmap. Writes XML → upload scan_results.xml';
     }
     if (os === 'iphone') {
       return 'Beta — works only from a MacBook. Phone must be connected by USB. Then run the command and upload scan_results.txt';

@@ -29,8 +29,8 @@ export const SCAN_MODES: ScanModeInfo[] = [
     id: 'network',
     label: 'Network',
     description:
-      'Scan with nmap to find exposed services and related CVE risks.',
-    available: false,
+      'Run nmap service detection, upload the XML report, and match exposed services to CVEs.',
+    available: true,
   },
 ];
 
@@ -128,7 +128,7 @@ export const FAQ_ITEMS: FaqItem[] = [
   {
     question: 'What are Browser and Network scan modes?',
     answer:
-      'Browser mode: enter a public website URL. CVEScan probes HTTP headers and HTML signals (Server, X-Powered-By, generator meta, common CMS fingerprints), then matches detected products to NVD CVEs. Network mode (coming soon) will use nmap-style discovery. Local Programs remains the installed-software scan, including iPhone (beta).',
+      'Browser mode: enter a public website URL. CVEScan probes HTTP headers and HTML signals, then matches detected products to NVD CVEs. Network mode: run nmap `-sV -oX`, upload the XML, and match discovered services/products to CVEs. Local Programs remains the installed-software scan, including iPhone (beta).',
   },
   {
     question: 'Do I need an account or API key to use the website scanner?',

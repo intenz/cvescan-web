@@ -61,12 +61,21 @@ export class ScanPageComponent implements OnInit {
     });
     if (!isPlatformBrowser(this.platformId)) return;
 
+    const restored = this.state.restorePrefs();
     const detectedOs = detectBrowserOs();
-    const os = isScanOsAvailable(detectedOs) ? detectedOs : 'macos';
-    // Preselect OS for tabs/command, but do not mark wizard step 1 done
-    // until the user explicitly confirms by clicking an OS tab.
-    this.state.os.set(os);
-    this.api.loadCommand(this.state.mode(), os);
+    const fallbackOs = isScanOsAvailable(detectedOs) ? detectedOs : 'macos';
+    if (!restored.os) {
+      // Preselect OS for tabs/command, but do not mark wizard step 1 done
+      // until the user explicitly confirms by clicking an OS tab.
+      this.state.os.set(fallbackOs);
+    } else if (
+      this.state.mode() !== 'local' &&
+      (this.state.os() === 'iphone' || this.state.os() === 'android')
+    ) {
+      this.state.os.set('macos');
+    }
+
+    this.api.loadCommand(this.state.mode(), this.state.os());
     this.api.loadCatalog();
   }
 
