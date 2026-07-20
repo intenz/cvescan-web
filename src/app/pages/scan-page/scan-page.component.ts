@@ -34,6 +34,7 @@ export class ScanPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.api.loadCommand(this.state.mode(), this.state.os());
+    this.api.loadCatalog();
   }
 
   today(): string {

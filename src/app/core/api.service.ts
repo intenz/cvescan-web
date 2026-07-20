@@ -43,6 +43,28 @@ export class ApiService {
       .subscribe((res) => this.state.setCommand(res.command, res.hint));
   }
 
+  loadCatalog(): void {
+    this.state.loading.set(true);
+    this.http
+      .get<ScanResponse>(`${this.base}/api/customer/catalog`, {
+        headers: this.headers(),
+      })
+      .pipe(
+        map((res) => res.cves ?? []),
+        catchError(() => of([] as CveItem[])),
+        tap({
+          next: (cves) => {
+            if (cves.length) {
+              this.state.setResults(cves, true);
+            }
+            this.state.loading.set(false);
+          },
+          error: () => this.state.loading.set(false),
+        }),
+      )
+      .subscribe();
+  }
+
   uploadScan(file: File, mode: ScanMode, os: ScanOs): Observable<CveItem[]> {
     const body = new FormData();
     body.append('file', file);

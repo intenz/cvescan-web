@@ -72,6 +72,7 @@ export class ScanStateService {
   setResults(cves: CveItem[], example = false): void {
     this.cves.set(cves);
     this.isExample.set(example);
+    // Catalog preview keeps uploaded=false; real scan sets uploaded=true
     this.uploaded.set(!example);
     this.selectedIds.set(new Set());
     this.closeSidebar();
