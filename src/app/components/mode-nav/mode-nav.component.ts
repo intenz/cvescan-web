@@ -1,7 +1,6 @@
 import { Component, inject } from '@angular/core';
 import type { ScanMode } from '../../core/models';
 import { ScanStateService } from '../../core/scan-state.service';
-import { ApiService } from '../../core/api.service';
 
 @Component({
   selector: 'cves-mode-nav',
@@ -11,12 +10,11 @@ import { ApiService } from '../../core/api.service';
 })
 export class ModeNavComponent {
   private readonly state = inject(ScanStateService);
-  private readonly api = inject(ApiService);
 
   readonly mode = this.state.mode;
 
   setMode(mode: ScanMode): void {
+    // Command reloads via scan-page effect watching mode/os.
     this.state.setMode(mode);
-    this.api.loadCommand(mode, this.state.os());
   }
 }

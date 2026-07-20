@@ -55,9 +55,9 @@ export const HOME_SEO = {
 };
 
 export const EXTERNAL_API_SEO = {
-  title: 'CVEScan External API — Commercial CPE → CVE Matching',
+  title: 'CVEScan External API — Commercial CPE → CVE Matching | cvescan.app',
   description:
-    'Commercial CPE to CVE matching API for integrations. Map software inventories to NVD vulnerabilities with CVSS severity — privacy-first, no client scan files stored.',
+    'Batch-scan up to 10 inventory files, download CSV reports, or POST /match on api.cvescan.app. Bearer auth, CVSS & CISA KEV — docs on cvescan.app/external-api.',
   canonical: `${SITE_URL}/external-api`,
 };
 

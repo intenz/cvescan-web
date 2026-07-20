@@ -139,6 +139,7 @@ export class ScanStateService {
   setMode(mode: ScanMode): void {
     this.mode.set(mode);
     this.error.set(null);
+    this.commandCopied.set(false);
     // Mobile OS tabs exist only in Local Programs.
     if (mode !== 'local') {
       const os = this.os();

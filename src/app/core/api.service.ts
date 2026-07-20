@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable, catchError, map, of, tap } from 'rxjs';
+import { Observable, catchError, map, of, tap, timeout } from 'rxjs';
 import { environment } from '../../environments/environment';
 import type { CveItem, ScanMode, ScanOs, Severity } from './models';
 import type { LiveFeedStatus } from './live-feeds';
@@ -38,11 +38,18 @@ interface FeedsResponse {
   feeds: LiveFeedStatus[];
 }
 
+interface EngagementResponse {
+  visits: number;
+  likes: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   private readonly http = inject(HttpClient);
   private readonly state = inject(ScanStateService);
   private readonly base = environment.apiUrl;
+  /** Bumps on every loadCommand so slower responses cannot overwrite a newer tab. */
+  private commandReq = 0;
 
   private headers(): HttpHeaders {
     return new HttpHeaders({
@@ -51,16 +58,23 @@ export class ApiService {
   }
 
   loadCommand(mode: ScanMode, os: ScanOs): void {
+    const req = ++this.commandReq;
     if (mode === 'browser') {
       this.state.setCommand('', 'Enter a website URL to probe public stack signals');
       return;
     }
+    // Show the correct mode/OS command immediately so Copy works while the API responds.
+    this.state.setCommand(
+      this.fallbackCommand(mode, os),
+      this.withDeviceHint(mode, os, this.fallbackHint(mode, os)),
+    );
     this.http
       .get<CommandResponse>(`${this.base}/api/customer/commands`, {
         params: { mode, os },
         headers: this.headers(),
       })
       .pipe(
+        timeout({ first: 8_000 }),
         catchError(() =>
           of({
             command: this.fallbackCommand(mode, os),
@@ -68,9 +82,13 @@ export class ApiService {
           }),
         ),
       )
-      .subscribe((res) =>
-        this.state.setCommand(res.command, this.withDeviceHint(mode, os, res.hint)),
-      );
+      .subscribe((res) => {
+        if (req !== this.commandReq) return;
+        this.state.setCommand(
+          res.command,
+          this.withDeviceHint(mode, os, res.hint),
+        );
+      });
   }
 
   scanSiteUrl(url: string): Observable<SiteScanResponse> {
@@ -179,6 +197,34 @@ export class ApiService {
         }),
       )
       .subscribe();
+  }
+
+  getEngagement(): Observable<EngagementResponse> {
+    return this.http
+      .get<EngagementResponse>(`${this.base}/api/customer/engagement`, {
+        headers: this.headers(),
+      })
+      .pipe(catchError(() => of({ visits: 0, likes: 0 })));
+  }
+
+  recordVisit(): Observable<EngagementResponse> {
+    return this.http
+      .post<EngagementResponse>(
+        `${this.base}/api/customer/engagement/visit`,
+        { action: 'visit' },
+        { headers: this.headers() },
+      )
+      .pipe(catchError(() => of({ visits: 0, likes: 0 })));
+  }
+
+  recordLike(): Observable<EngagementResponse> {
+    return this.http
+      .post<EngagementResponse>(
+        `${this.base}/api/customer/engagement/like`,
+        { action: 'like' },
+        { headers: this.headers() },
+      )
+      .pipe(catchError(() => of({ visits: 0, likes: 0 })));
   }
 
   uploadScan(file: File, mode: ScanMode, os: ScanOs): Observable<CveItem[]> {

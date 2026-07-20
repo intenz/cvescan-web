@@ -1,7 +1,20 @@
 <section class="cves-command">
   <div class="cves-command__box">
     <code>{{ state.command() || 'Loading command…' }}</code>
-    <button type="button" (click)="copy()">{{ copied ? 'copied' : 'copy' }}</button>
+    <button
+      type="button"
+      [disabled]="!canCopy()"
+      [attr.aria-label]="copied() ? 'Copied' : 'Copy command'"
+      (click)="copy()"
+    >
+      @if (copyFailed()) {
+        failed
+      } @else if (copied()) {
+        copied
+      } @else {
+        copy
+      }
+    </button>
   </div>
   <p class="cves-command__hint">
     ↳ {{ state.hint() || 'Run the command, then upload the result file' }}

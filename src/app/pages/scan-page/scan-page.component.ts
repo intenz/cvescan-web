@@ -75,7 +75,6 @@ export class ScanPageComponent implements OnInit {
       this.state.os.set('macos');
     }
 
-    this.api.loadCommand(this.state.mode(), this.state.os());
     this.api.loadCatalog();
   }
 

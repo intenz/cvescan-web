@@ -8,7 +8,7 @@ import {
   signal,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import type { ScanMode } from '../../core/models';
 import {
   LIVE_FEED_DEFINITIONS,
@@ -30,6 +30,7 @@ import { ThemeToggleComponent } from '../theme-toggle/theme-toggle.component';
 export class HeaderComponent implements OnInit, OnDestroy {
   private readonly state = inject(ScanStateService);
   private readonly api = inject(ApiService);
+  private readonly router = inject(Router);
   private readonly platformId = inject(PLATFORM_ID);
   private feedTimer: ReturnType<typeof setInterval> | null = null;
 
@@ -68,6 +69,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     const info = modeInfo(mode);
     if (!info.available) return;
     this.state.setMode(mode);
-    this.api.loadCommand(mode, this.state.os());
+    // Mode UI lives on the scan page — leave FAQ / External API when switching.
+    void this.router.navigateByUrl('/');
   }
 }

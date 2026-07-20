@@ -2,7 +2,6 @@ import { Component, computed, inject } from '@angular/core';
 import { BETA_SCAN_OS, SOON_SCAN_OS } from '../../core/detect-browser-os';
 import type { ScanOs } from '../../core/models';
 import { ScanStateService } from '../../core/scan-state.service';
-import { ApiService } from '../../core/api.service';
 
 type OsOption = {
   id: ScanOs;
@@ -43,7 +42,6 @@ const MOBILE_OS: OsOption[] = [
 })
 export class OsTabsComponent {
   private readonly state = inject(ScanStateService);
-  private readonly api = inject(ApiService);
 
   readonly os = this.state.os;
   /** iPhone / Android only in Local Programs. */
@@ -53,7 +51,7 @@ export class OsTabsComponent {
 
   select(os: ScanOs, soon?: boolean): void {
     if (soon) return;
+    // Command reloads via scan-page effect watching mode/os.
     this.state.setOs(os);
-    this.api.loadCommand(this.state.mode(), os);
   }
 }

@@ -1,35 +1,166 @@
 <section class="cves-ext">
-  <h1>External API — Commercial CPE → CVE Matching</h1>
+  <p class="cves-ext__eyebrow">Commercial · CPE → CVE</p>
+  <h1>External API for {{ site.replace('https://', '') }}</h1>
   <p class="cves-ext__lead">
-    Commercial CPE to CVE matching API for integrations. Map software inventories and CPE
-    identifiers to NVD vulnerabilities with CVSS severity. Documentation only on this page —
-    live calls are not enabled from the website UI.
+    Ship the same matching engine that powers
+    <a [href]="site">{{ site.replace('https://', '') }}</a>
+    into your products, CI, and fleet agents. Map CPE identifiers or product/version
+    inventories to NVD CVEs with CVSS, CISA KEV, and enrichment — at integration scale.
   </p>
 
-  <h2>Base URL</h2>
-  <code>https://api.cvescan.app/api/external</code>
+  <div class="cves-ext__banner" role="note">
+    <strong>Documentation &amp; examples only.</strong>
+    This page does not call the live API from the browser. Replace
+    <code>YOUR_API_KEY</code> after you receive access. Base host:
+    <code>api.cvescan.app</code>.
+  </div>
 
-  <h2>Authentication</h2>
-  <p><code>Authorization: Bearer &lt;api_key&gt;</code></p>
+  <div class="cves-ext__cta">
+    <a class="cves-ext__cta-btn" href="mailto:support&#64;cvescan.app?subject=CVEScan%20External%20API%20access">
+      ★ Request API access
+    </a>
+    <span class="cves-ext__cta-note">Email support&#64;cvescan.app — we issue keys for production use.</span>
+  </div>
 
-  <h2>Endpoints</h2>
-  <ul>
-    <li>
-      <code>POST /match</code> — body with <code>cpes</code> array or <code>products</code> list
-    </li>
-    <li><code>GET /match?cpe=</code> — match a single CPE against known CVEs</li>
-    <li><code>GET /cve/:cveId</code> — CVE details (+ Nuclei link when available)</li>
-    <li><code>GET /health</code> — health check</li>
+  <h2 id="why">Why teams buy External API</h2>
+  <ul class="cves-ext__benefits">
+    @for (b of benefits; track b.title) {
+      <li>
+        <h3>{{ b.title }}</h3>
+        <p>{{ b.body }}</p>
+      </li>
+    }
   </ul>
 
-  <h2>Privacy</h2>
-  <p>
-    Client scan files from the web product are never stored. This API reads the shared vulnerability
-    catalog only — privacy-first CPE → CVE matching for production integrations.
+  <h2 id="base">Base URL</h2>
+  <pre class="cves-ext__pre"><code>{{ base }}</code></pre>
+  <p class="cves-ext__muted">
+    Public product: <a [href]="site">{{ site }}</a>
+    · API host: <code>https://api.cvescan.app</code>
   </p>
 
+  <h2 id="auth">Authentication</h2>
+  <p>
+    All endpoints except <code>GET /health</code> require a Bearer token:
+  </p>
+  <pre class="cves-ext__pre"><code>Authorization: Bearer YOUR_API_KEY</code></pre>
+
+  <h2 id="reference">API reference</h2>
+  <p class="cves-ext__muted">
+    The two endpoints that matter for most integrations. Samples use
+    <code>api.cvescan.app</code>. Full surface (health, single-CPE GET, CVE lookup)
+    is available after you get a key — ask support if you need those details.
+  </p>
+
+  <div class="cves-ext__lang" role="tablist" aria-label="Example language">
+    <button
+      type="button"
+      role="tab"
+      [class.is-active]="exampleLang() === 'curl'"
+      (click)="setLang('curl')"
+    >cURL</button>
+    <button
+      type="button"
+      role="tab"
+      [class.is-active]="exampleLang() === 'javascript'"
+      (click)="setLang('javascript')"
+    >JavaScript</button>
+    <button
+      type="button"
+      role="tab"
+      [class.is-active]="exampleLang() === 'python'"
+      (click)="setLang('python')"
+    >Python</button>
+  </div>
+
+  @for (ep of endpoints; track ep.id) {
+    <article class="cves-ext__ep" [id]="ep.id">
+      <header class="cves-ext__ep-head">
+        <span class="cves-ext__method" [attr.data-method]="ep.method">{{ ep.method }}</span>
+        <code class="cves-ext__path">{{ ep.path }}</code>
+        @if (ep.auth) {
+          <span class="cves-ext__badge">Bearer</span>
+        } @else {
+          <span class="cves-ext__badge is-public">Public</span>
+        }
+      </header>
+      <h3>{{ ep.title }}</h3>
+      <p>{{ ep.summary }}</p>
+
+      @if (ep.request) {
+        <h4>Request</h4>
+        <pre class="cves-ext__pre"><code>{{ ep.request }}</code></pre>
+      }
+      @if (ep.response) {
+        <h4>Response</h4>
+        <pre class="cves-ext__pre"><code>{{ ep.response }}</code></pre>
+      }
+
+      <div class="cves-ext__example-bar">
+        <h4>Example</h4>
+        <button type="button" class="cves-ext__copy" (click)="copyExample(ep)">
+          {{ copiedId() === ep.id ? 'copied' : 'copy' }}
+        </button>
+      </div>
+      <pre class="cves-ext__pre is-example"><code>{{ exampleFor(ep) }}</code></pre>
+    </article>
+  }
+
+  <h2 id="errors">Errors</h2>
+  <div class="cves-ext__table-wrap">
+    <table class="cves-ext__table">
+      <thead>
+        <tr>
+          <th>HTTP</th>
+          <th>Code</th>
+          <th>Meaning</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (e of errors; track e.code) {
+          <tr>
+            <td><code>{{ e.status }}</code></td>
+            <td><code>{{ e.code }}</code></td>
+            <td>{{ e.meaning }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="custom">Custom development</h2>
+  <p>
+    Beyond the standard External API, we can build a <strong>unique solution for your team</strong> —
+    private endpoints, custom report layouts, SSO / org keys, fleet agents, or deep embedding into
+    your product. If the public surface is not enough, describe the workflow and we will scope a fit.
+  </p>
+  <div class="cves-ext__cta">
+    <a
+      class="cves-ext__cta-btn is-secondary"
+      href="mailto:support&#64;cvescan.app?subject=CVEScan%20custom%20development"
+    >
+      Discuss a custom build
+    </a>
+    <span class="cves-ext__cta-note">
+      Email support&#64;cvescan.app with your use case — API access and custom work both start there.
+    </span>
+  </div>
+
+  <h2 id="roadmap">Commercial extras (roadmap)</h2>
+  <ul class="cves-ext__list">
+    <li>Scheduled reporting webhooks and signed audit exports</li>
+    <li>Remediation / “how to resolve this CVE” guidance in the payload</li>
+    <li>Org-level usage dashboards on cvescan.app</li>
+    <li>Higher rate limits / org API keys for large fleets</li>
+  </ul>
+
   <p class="cves-ext__note">
-    Contact <a href="mailto:support&#64;cvescan.app">support&#64;cvescan.app</a> for API access.
+    Ready to integrate or need a custom build?
+    <a href="mailto:support&#64;cvescan.app?subject=CVEScan%20External%20API%20access">Request a key</a>
+    ·
+    <a href="mailto:support&#64;cvescan.app?subject=CVEScan%20custom%20development">Custom development</a>
+    ·
+    <a href="mailto:support&#64;cvescan.app">support&#64;cvescan.app</a>
   </p>
 
   <cves-copyright />

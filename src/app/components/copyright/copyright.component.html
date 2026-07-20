@@ -1,13 +1,40 @@
 <div class="cves-copy">
-  <p>
-    © Viktor Hnativ {{ year }} · AI based ·
-    <a href="https://cvescan.app">cvescan.app</a>
-  </p>
-  <p>
-    <a href="https://www.linkedin.com/in/viktor-hnativ-968355110" target="_blank" rel="noopener"
-      >LinkedIn</a
+  <div class="cves-copy__main">
+    <p>
+      © Viktor Hnativ {{ year }} · AI based ·
+      <a href="https://cvescan.app">cvescan.app</a>
+    </p>
+    <p>
+      <a href="https://www.linkedin.com/in/viktor-hnativ-968355110" target="_blank" rel="noopener"
+        >LinkedIn</a
+      >
+      ·
+      <a href="mailto:support&#64;cvescan.app">support&#64;cvescan.app</a>
+    </p>
+  </div>
+
+  <div class="cves-copy__engage" aria-label="Site feedback">
+    <button
+      type="button"
+      class="cves-copy__like"
+      [class.is-liked]="liked()"
+      [disabled]="liked() || likeBusy()"
+      [attr.aria-pressed]="liked()"
+      [title]="liked() ? 'Thanks — you already liked CVEScan' : 'Happy with CVEScan? Leave a like'"
+      (click)="like()"
     >
-    ·
-    <a href="mailto:support&#64;cvescan.app">support&#64;cvescan.app</a>
-  </p>
+      <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+        <path
+          d="M8 13.5S2.5 10.2 2.5 6.4A2.9 2.9 0 0 1 8 4.8a2.9 2.9 0 0 1 5.5 1.6C13.5 10.2 8 13.5 8 13.5z"
+          fill="currentColor"
+          fill-opacity="0.92"
+        />
+      </svg>
+      <span>{{ liked() ? 'Liked' : 'Like' }}</span>
+      <strong>{{ formatCount(likes()) }}</strong>
+    </button>
+    <span class="cves-copy__visits" title="Counted once per browser session">
+      {{ formatCount(visits()) }} unique users
+    </span>
+  </div>
 </div>

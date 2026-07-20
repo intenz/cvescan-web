@@ -2,11 +2,18 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  gap: 0.5rem;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
   padding: 0.75rem 1.25rem 1.25rem;
   color: var(--cves-text-dim);
   border-top: 1px solid var(--cves-border);
   animation: cves-copy-in 0.55s ease both;
+
+  &__main {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 1rem;
+  }
 
   p {
     margin: 0;
@@ -19,6 +26,63 @@
     &:hover {
       color: var(--cves-green);
     }
+  }
+
+  &__engage {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  &__like {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin: 0;
+    padding: 0.3rem 0.55rem;
+    border: 1px solid var(--cves-border);
+    border-radius: 6px;
+    background: transparent;
+    color: var(--cves-text-muted);
+    font: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition:
+      color 0.2s ease,
+      border-color 0.2s ease,
+      background 0.2s ease,
+      transform 0.15s ease;
+
+    strong {
+      font-weight: 600;
+      color: var(--cves-text);
+    }
+
+    &:hover:not(:disabled) {
+      color: var(--cves-green);
+      border-color: color-mix(in srgb, var(--cves-green) 45%, var(--cves-border));
+      transform: translateY(-1px);
+    }
+
+    &:disabled {
+      cursor: default;
+    }
+
+    &.is-liked {
+      color: var(--cves-green);
+      border-color: color-mix(in srgb, var(--cves-green) 40%, var(--cves-border));
+      background: color-mix(in srgb, var(--cves-green) 8%, transparent);
+
+      strong {
+        color: var(--cves-green);
+      }
+    }
+  }
+
+  &__visits {
+    font-size: 0.85rem;
+    color: var(--cves-text-dim);
+    white-space: nowrap;
   }
 }
 
