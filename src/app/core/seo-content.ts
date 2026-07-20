@@ -6,6 +6,7 @@ export const SITE_NAME = 'CVEScan';
 export interface ScanModeInfo {
   id: ScanMode;
   label: string;
+  h1: string;
   description: string;
   available: boolean;
 }
@@ -14,6 +15,7 @@ export const SCAN_MODES: ScanModeInfo[] = [
   {
     id: 'local',
     label: 'Local Programs',
+    h1: 'Runtime CVE scanner for installed software',
     description:
       'Upload installed software. We map each product CPE → CVE and list known vulnerabilities.',
     available: true,
@@ -21,6 +23,7 @@ export const SCAN_MODES: ScanModeInfo[] = [
   {
     id: 'browser',
     label: 'Browser',
+    h1: 'Runtime CVE scanner for websites',
     description:
       'Enter a website URL. We probe public headers/HTML for stack signals and match related CVEs.',
     available: true,
@@ -28,6 +31,7 @@ export const SCAN_MODES: ScanModeInfo[] = [
   {
     id: 'network',
     label: 'Network',
+    h1: 'Runtime CVE scanner for network services',
     description:
       'Run nmap service detection, upload the XML report, and match exposed services to CVEs.',
     available: true,
