@@ -51,11 +51,13 @@ export class ApiService {
         catchError(() =>
           of({
             command: this.fallbackCommand(os),
-            hint: 'Run the command, then upload scan_results.txt',
+            hint: this.fallbackHint(os),
           }),
         ),
       )
-      .subscribe((res) => this.state.setCommand(res.command, res.hint));
+      .subscribe((res) =>
+        this.state.setCommand(res.command, this.withDeviceHint(os, res.hint)),
+      );
   }
 
   loadCatalog(
@@ -169,10 +171,24 @@ export class ApiService {
       linux:
         "dpkg-query -W -f='${Package} ${Version}\\n' > scan_results.txt 2>/dev/null || rpm -qa > scan_results.txt",
       windows:
-        'Get-ItemProperty HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\* | Select-Object DisplayName, DisplayVersion | Out-File -Encoding utf8 scan_results.txt',
-      iphone: 'ideviceinstaller -l > scan_results.txt',
+        'winget list --accept-source-agreements | Out-File -FilePath "$env:USERPROFILE\\scan_results.txt" -Encoding utf8',
+      iphone:
+        'brew install libimobiledevice ideviceinstaller 2>/dev/null; ideviceinstaller list --all > scan_results.txt',
       android: 'adb shell pm list packages -f > scan_results.txt',
     };
     return map[os];
+  }
+
+  private fallbackHint(os: ScanOs): string {
+    if (os === 'iphone' || os === 'android') {
+      return 'Phone must be connected by USB. Then run the command and upload scan_results.txt';
+    }
+    return 'Run the command, then upload scan_results.txt';
+  }
+
+  private withDeviceHint(os: ScanOs, hint: string): string {
+    if (os !== 'iphone' && os !== 'android') return hint;
+    if (/connected by usb/i.test(hint)) return hint;
+    return `Phone must be connected by USB. ${hint}`;
   }
 }
