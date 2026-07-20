@@ -1,0 +1,36 @@
+<section class="cves-seo-crawl" aria-label="About CVEScan">
+  <h2>How CVEScan works</h2>
+  <p>{{ home.tagline }}</p>
+  <ol>
+    @for (step of howItWorks; track step.title) {
+      <li>
+        <strong>{{ step.title }}</strong>
+        — {{ step.body }}
+      </li>
+    }
+  </ol>
+
+  <h2>Scan modes</h2>
+  <ul>
+    @for (m of modes; track m.id) {
+      <li>
+        <strong>{{ m.label }}</strong>
+        @if (!m.available) {
+          (coming soon)
+        }
+        — {{ m.description }}
+      </li>
+    }
+  </ul>
+
+  <h2>Privacy</h2>
+  <p>{{ privacy }}</p>
+
+  <p>
+    Read more in the
+    <a routerLink="/faq">CVEScan FAQ</a>
+    and
+    <a routerLink="/external-api">External API</a>
+    docs.
+  </p>
+</section>

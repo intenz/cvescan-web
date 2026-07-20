@@ -1,7 +1,21 @@
-<label class="cves-upload">
-  <input type="file" accept=".txt,text/plain" (change)="onFile($event)" />
-  <span>{{ state.loading() ? 'Scanning…' : 'Upload scan_results.txt' }}</span>
-</label>
-@if (state.error()) {
-  <p class="cves-upload__error">{{ state.error() }}</p>
-}
+<div class="cves-upload-wrap">
+  <label class="cves-upload" [class.is-busy]="busy()">
+    <input type="file" accept=".txt,text/plain" (change)="onFile($event)" [disabled]="busy()" />
+    @if (busy()) {
+      <span class="cves-upload__pulse" aria-hidden="true"></span>
+      <span class="cves-upload__stage">
+        @for (s of [stage()]; track stageIndex()) {
+          <span class="cves-upload__stage-text">{{ s }}</span>
+        }
+      </span>
+    } @else {
+      <span>Upload scan_results.txt</span>
+    }
+  </label>
+  <p class="cves-upload__hint">
+    No client data stored. Upload an inventory file, get matched CVEs from NVD — your <code>scan_results.txt</code> is not retained after the scan.
+  </p>
+  @if (state.error()) {
+    <p class="cves-upload__error">{{ state.error() }}</p>
+  }
+</div>

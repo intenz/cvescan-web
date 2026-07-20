@@ -23,12 +23,32 @@
         </button>
       }
     </nav>
-    <p class="cves-header__mode-desc">{{ activeMode().description }}</p>
   </div>
 
   <div class="cves-header__right">
-    <span class="cves-header__live"><i></i> NVD LIVE</span>
+    <span class="cves-header__live" [attr.aria-label]="liveLabel()">
+      <i aria-hidden="true"></i>
+      <span class="cves-header__live-slot" [style.width.ch]="liveSlotCh">
+        @for (label of [liveLabel()]; track feedIndex()) {
+          <span class="cves-header__live-text">{{ label }}</span>
+        }
+      </span>
+    </span>
     <cves-theme-toggle />
+    <a class="cves-header__link" routerLink="/faq" routerLinkActive="is-active" title="FAQ">
+      <svg class="cves-header__faq-icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+        <circle cx="8" cy="8" r="6.25" fill="none" stroke="currentColor" stroke-width="1.4"/>
+        <path
+          d="M5.7 6.1c0-1.2.9-2.05 2.15-2.05S10 4.95 10 6c0 .85-.45 1.35-1.2 1.8-.6.35-.85.65-.85 1.25v.2"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.35"
+          stroke-linecap="round"
+        />
+        <circle cx="8" cy="11.35" r="0.85" fill="currentColor"/>
+      </svg>
+      FAQ
+    </a>
     <a class="cves-header__api" routerLink="/external-api" routerLinkActive="is-active">
       External API
     </a>

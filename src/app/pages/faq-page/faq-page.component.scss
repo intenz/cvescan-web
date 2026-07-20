@@ -1,0 +1,97 @@
+.cves-faq-page {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 2rem;
+
+  &__head {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.85rem;
+    margin-bottom: 1.5rem;
+  }
+
+  &__icon {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    margin-top: 0.1rem;
+  }
+
+  h1 {
+    margin: 0 0 0.4rem;
+    color: var(--cves-green);
+    font-size: 1.25rem;
+  }
+
+  &__lead {
+    margin: 0;
+    color: var(--cves-text-muted);
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+
+  &__item {
+    border: 1px solid var(--cves-border);
+    border-radius: 6px;
+    background: var(--cves-surface);
+    padding: 0.7rem 0.85rem;
+    transition: border-color 0.2s ease;
+
+    &[open] {
+      border-color: var(--cves-border2);
+    }
+
+    summary {
+      cursor: pointer;
+      color: var(--cves-text);
+      font-size: 0.88rem;
+      font-weight: 600;
+      line-height: 1.4;
+      list-style: none;
+
+      &::-webkit-details-marker {
+        display: none;
+      }
+
+      &::before {
+        content: '+';
+        display: inline-block;
+        width: 1.1rem;
+        color: var(--cves-green);
+        font-weight: 700;
+      }
+    }
+
+    &[open] summary::before {
+      content: '−';
+    }
+
+    p {
+      margin: 0.65rem 0 0.15rem;
+      padding-left: 1.1rem;
+      color: var(--cves-text-muted);
+      font-size: 0.82rem;
+      line-height: 1.55;
+    }
+  }
+
+  &__back {
+    margin: 1.75rem 0 0;
+    color: var(--cves-text-dim);
+    font-size: 0.8rem;
+
+    a {
+      color: var(--cves-text-muted);
+
+      &:hover {
+        color: var(--cves-green);
+      }
+    }
+  }
+}

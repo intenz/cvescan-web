@@ -1,0 +1,32 @@
+<section class="cves-faq-page">
+  <header class="cves-faq-page__head">
+    <img
+      class="cves-faq-page__icon"
+      src="faq-icon.svg"
+      width="40"
+      height="40"
+      alt=""
+    />
+    <div>
+      <h1>{{ page.h1 }}</h1>
+      <p class="cves-faq-page__lead">{{ page.lead }}</p>
+    </div>
+  </header>
+
+  <div class="cves-faq-page__list">
+    @for (item of faq; track item.question) {
+      <details class="cves-faq-page__item">
+        <summary>{{ item.question }}</summary>
+        <p>{{ item.answer }}</p>
+      </details>
+    }
+  </div>
+
+  <p class="cves-faq-page__back">
+    <a routerLink="/">← Back to scanner</a>
+    ·
+    <a routerLink="/external-api">External API</a>
+  </p>
+
+  <cves-copyright />
+</section>

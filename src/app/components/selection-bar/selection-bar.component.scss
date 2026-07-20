@@ -7,6 +7,7 @@
   padding: 0.75rem 1.25rem;
   border-top: 1px solid var(--cves-border);
   background: var(--cves-surface);
+  animation: cves-footer-up 0.4s ease;
 
   &__stats {
     color: var(--cves-text-muted);
@@ -27,6 +28,19 @@
       border-radius: 4px;
       padding: 0.4rem 0.75rem;
       cursor: pointer;
+      transition:
+        border-color 0.2s ease,
+        background 0.2s ease,
+        transform 0.15s ease;
+
+      &:hover:not(:disabled) {
+        border-color: var(--cves-green);
+        transform: translateY(-1px);
+      }
+
+      &:active:not(:disabled) {
+        transform: scale(0.97);
+      }
     }
   }
 
@@ -35,5 +49,16 @@
     border-color: var(--cves-red) !important;
     color: #fff !important;
     opacity: 0.85;
+  }
+}
+
+@keyframes cves-footer-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

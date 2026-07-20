@@ -1,4 +1,7 @@
 <section class="cves-scan">
+  <h1 class="cves-scan__title">{{ home.h1 }}</h1>
+  <p class="cves-scan__tagline">{{ home.tagline }}</p>
+
   <div class="cves-scan__strip" [class.is-collapsed]="state.stripCollapsed()">
     <div class="cves-scan__strip-head">
       <cves-scan-wizard />
@@ -7,16 +10,20 @@
         class="cves-scan__collapse"
         (click)="state.toggleStrip()"
         [attr.aria-expanded]="!state.stripCollapsed()"
+        [attr.aria-label]="state.stripCollapsed() ? 'Expand scan setup' : 'Collapse scan setup'"
       >
+        <span class="cves-scan__collapse-icon" aria-hidden="true">▾</span>
         {{ state.stripCollapsed() ? 'Expand' : 'Collapse' }}
       </button>
     </div>
 
-    @if (!state.stripCollapsed()) {
-      <cves-os-tabs />
-      <cves-command-panel />
-      <cves-upload-zone />
-    }
+    <div class="cves-scan__strip-body" [class.is-collapsed]="state.stripCollapsed()">
+      <div class="cves-scan__strip-body-inner">
+        <cves-os-tabs />
+        <cves-command-panel />
+        <cves-upload-zone />
+      </div>
+    </div>
   </div>
 
   @if (state.isExample()) {
@@ -25,7 +32,7 @@
     </div>
   }
 
-  <div class="cves-scan__main" [class.has-sidebar]="state.sidebarOpen()">
+  <div class="cves-scan__main">
     <div class="cves-scan__table">
       <cves-cve-filters />
       <cves-cve-table />
@@ -33,14 +40,12 @@
         NVD data · {{ today() }} · No client data stored
       </p>
     </div>
-    @if (state.sidebarOpen()) {
-      <cves-cve-sidebar />
-    }
+    <cves-cve-sidebar />
   </div>
 
   @if (state.selectedIds().size > 0) {
     <cves-selection-bar />
   }
   <cves-copyright />
-  <cves-seo-landing />
+  <cves-seo-crawl />
 </section>
