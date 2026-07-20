@@ -26,12 +26,21 @@
   </div>
 
   <div class="cves-header__right">
-    <span class="cves-header__live" [attr.aria-label]="liveLabel()">
+    <span
+      class="cves-header__live"
+      tabindex="0"
+      [attr.aria-label]="liveLabel() + '. ' + liveUpdatedLabel()"
+      [title]="liveTooltip()"
+    >
       <i aria-hidden="true"></i>
       <span class="cves-header__live-slot" [style.width.ch]="liveSlotCh">
         @for (label of [liveLabel()]; track feedIndex()) {
           <span class="cves-header__live-text">{{ label }}</span>
         }
+      </span>
+      <span class="cves-header__live-tip" role="tooltip">
+        <span class="cves-header__live-tip-desc">{{ activeFeed().description }}</span>
+        <span class="cves-header__live-tip-time">{{ liveUpdatedLabel() }}</span>
       </span>
     </span>
     <cves-theme-toggle />

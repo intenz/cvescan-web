@@ -3,6 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, map, of, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
 import type { CveItem, ScanMode, ScanOs, Severity } from './models';
+import type { LiveFeedStatus } from './live-feeds';
 import { ScanStateService } from './scan-state.service';
 
 interface CommandResponse {
@@ -20,6 +21,12 @@ interface CatalogResponse {
   page: number;
   limit: number;
   totalPages: number;
+  /** Optional per-feed sync timestamps from catalog API. */
+  feeds?: LiveFeedStatus[];
+}
+
+interface FeedsResponse {
+  feeds: LiveFeedStatus[];
 }
 
 @Injectable({ providedIn: 'root' })
@@ -73,6 +80,7 @@ export class ApiService {
             page: 1,
             limit: this.state.pageSize,
             totalPages: 1,
+            feeds: [] as LiveFeedStatus[],
           }),
         ),
         tap({
@@ -82,6 +90,9 @@ export class ApiService {
               res.total ?? 0,
               res.page ?? page,
             );
+            if (res.feeds?.length) {
+              this.state.setFeedStatus(res.feeds);
+            }
             this.state.loading.set(false);
           },
           error: () => this.state.loading.set(false),
@@ -104,6 +115,23 @@ export class ApiService {
     if (this.state.isExample()) {
       this.loadCatalog(1, filter);
     }
+  }
+
+  /** Load NVD / VulnCheck / KEV sync timestamps when backend exposes them. */
+  loadFeedStatus(): void {
+    this.http
+      .get<FeedsResponse>(`${this.base}/api/customer/feeds`, {
+        headers: this.headers(),
+      })
+      .pipe(
+        catchError(() => of({ feeds: [] as LiveFeedStatus[] })),
+        tap((res) => {
+          if (res.feeds?.length) {
+            this.state.setFeedStatus(res.feeds);
+          }
+        }),
+      )
+      .subscribe();
   }
 
   uploadScan(file: File, mode: ScanMode, os: ScanOs): Observable<CveItem[]> {

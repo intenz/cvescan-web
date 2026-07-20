@@ -1,4 +1,5 @@
 import { Injectable, computed, signal } from '@angular/core';
+import type { LiveFeedId, LiveFeedStatus } from './live-feeds';
 import {
   EXAMPLE_CVES,
   type CveItem,
@@ -29,6 +30,8 @@ export class ScanStateService {
   readonly error = signal<string | null>(null);
   readonly stripCollapsed = signal(false);
   readonly sidebarOpen = signal(false);
+  /** ISO timestamps per feed — populated from API when available. */
+  readonly feedLastUpdated = signal<Partial<Record<LiveFeedId, string | null>>>({});
 
   /** When true, pagination is fetched from API (catalog preview). */
   readonly serverPaging = computed(() => this.isExample());
@@ -190,5 +193,14 @@ export class ScanStateService {
     const next = new Set(this.selectedIds());
     next.add(id);
     this.selectedIds.set(next);
+  }
+
+  setFeedStatus(feeds: LiveFeedStatus[]): void {
+    if (!feeds.length) return;
+    const next = { ...this.feedLastUpdated() };
+    for (const feed of feeds) {
+      next[feed.id] = feed.lastUpdated;
+    }
+    this.feedLastUpdated.set(next);
   }
 }

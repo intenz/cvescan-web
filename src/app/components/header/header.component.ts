@@ -10,8 +10,12 @@ import {
 import { isPlatformBrowser } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import type { ScanMode } from '../../core/models';
+import {
+  LIVE_FEED_DEFINITIONS,
+  formatFeedUpdatedAt,
+  liveFeedTooltip,
+} from '../../core/live-feeds';
 import { SCAN_MODES, modeInfo } from '../../core/seo-content';
-import { LIVE_FEEDS } from '../../core/ui-motion';
 import { ScanStateService } from '../../core/scan-state.service';
 import { ApiService } from '../../core/api.service';
 import { ThemeToggleComponent } from '../theme-toggle/theme-toggle.component';
@@ -31,16 +35,28 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   readonly modes = SCAN_MODES;
   readonly mode = this.state.mode;
-  readonly feeds = LIVE_FEEDS;
+  readonly feedDefinitions = LIVE_FEED_DEFINITIONS;
   readonly feedIndex = signal(0);
-  readonly liveLabel = computed(() => this.feeds[this.feedIndex()]);
+  readonly activeFeed = computed(() => this.feedDefinitions[this.feedIndex()]);
+  readonly liveLabel = computed(() => this.activeFeed().label);
+  readonly liveTooltip = computed(() =>
+    liveFeedTooltip(
+      this.activeFeed(),
+      this.state.feedLastUpdated()[this.activeFeed().id],
+    ),
+  );
+  readonly liveUpdatedLabel = computed(() =>
+    formatFeedUpdatedAt(this.state.feedLastUpdated()[this.activeFeed().id]),
+  );
   /** Longest feed label + buffer — letter-spacing makes ch slightly tight. */
-  readonly liveSlotCh = Math.max(...LIVE_FEEDS.map((f) => f.length)) + 2;
+  readonly liveSlotCh =
+    Math.max(...LIVE_FEED_DEFINITIONS.map((f) => f.label.length)) + 2;
 
   ngOnInit(): void {
     if (!isPlatformBrowser(this.platformId)) return;
+    this.api.loadFeedStatus();
     this.feedTimer = setInterval(() => {
-      this.feedIndex.update((i) => (i + 1) % this.feeds.length);
+      this.feedIndex.update((i) => (i + 1) % this.feedDefinitions.length);
     }, 2800);
   }
 
