@@ -1,0 +1,7 @@
+<label class="cves-upload">
+  <input type="file" accept=".txt,text/plain" (change)="onFile($event)" />
+  <span>{{ state.loading() ? 'Scanning…' : 'Upload scan_results.txt' }}</span>
+</label>
+@if (state.error()) {
+  <p class="cves-upload__error">{{ state.error() }}</p>
+}

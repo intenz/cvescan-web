@@ -1,0 +1,20 @@
+.cves-upload {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--cves-green);
+  color: #04110a;
+  font-weight: 600;
+  padding: 0.65rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+
+  input {
+    display: none;
+  }
+
+  &__error {
+    color: var(--cves-red);
+    margin: 0.5rem 0 0;
+  }
+}

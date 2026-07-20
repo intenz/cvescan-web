@@ -1,0 +1,47 @@
+@use './styles/tokens';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: var(--cves-bg);
+  color: var(--cves-text);
+  font-family: var(--cves-font);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+a {
+  color: var(--cves-blue);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--cves-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--cves-border2);
+  border-radius: 2px;
+}

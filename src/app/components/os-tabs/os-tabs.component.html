@@ -1,0 +1,12 @@
+<div class="cves-os" role="tablist" aria-label="Operating system">
+  @for (opt of options; track opt.id) {
+    <button
+      type="button"
+      role="tab"
+      [class.is-active]="os() === opt.id"
+      (click)="select(opt.id)"
+    >
+      {{ opt.label }}
+    </button>
+  }
+</div>

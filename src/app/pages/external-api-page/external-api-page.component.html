@@ -1,0 +1,35 @@
+<section class="cves-ext">
+  <h1>External API</h1>
+  <p class="cves-ext__lead">
+    Commercial CPE → CVE matching for integrations. Documentation only on this page —
+    live calls are not enabled from the website UI.
+  </p>
+
+  <h2>Base URL</h2>
+  <code>https://api.cvescan.app/api/external</code>
+
+  <h2>Authentication</h2>
+  <p><code>Authorization: Bearer &lt;api_key&gt;</code></p>
+
+  <h2>Endpoints</h2>
+  <ul>
+    <li>
+      <code>POST /match</code> — body with <code>cpes</code> array or <code>products</code> list
+    </li>
+    <li><code>GET /match?cpe=</code> — match a single CPE</li>
+    <li><code>GET /cve/:cveId</code> — CVE details (+ Nuclei link when available)</li>
+    <li><code>GET /health</code> — health check</li>
+  </ul>
+
+  <h2>Privacy</h2>
+  <p>
+    Client scan files from the web product are never stored. This API reads the shared vulnerability
+    catalog only.
+  </p>
+
+  <p class="cves-ext__note">
+    Contact <a href="mailto:support&#64;cvescan.app">support&#64;cvescan.app</a> for API access.
+  </p>
+
+  <cves-copyright />
+</section>

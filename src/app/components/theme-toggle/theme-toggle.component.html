@@ -1,0 +1,11 @@
+<div class="cves-theme" role="group" aria-label="Theme">
+  @for (mode of modes; track mode) {
+    <button
+      type="button"
+      [class.is-active]="theme.mode() === mode"
+      (click)="theme.setMode(mode)"
+    >
+      {{ label(mode) }}
+    </button>
+  }
+</div>

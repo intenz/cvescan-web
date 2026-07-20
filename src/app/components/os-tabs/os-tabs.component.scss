@@ -1,0 +1,21 @@
+.cves-os {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+
+  button {
+    background: var(--cves-surface2);
+    border: 1px solid var(--cves-border);
+    color: var(--cves-text-muted);
+    padding: 0.4rem 0.75rem;
+    border-radius: 999px;
+    cursor: pointer;
+
+    &.is-active {
+      color: var(--cves-bg);
+      background: var(--cves-green);
+      border-color: var(--cves-green);
+      font-weight: 600;
+    }
+  }
+}

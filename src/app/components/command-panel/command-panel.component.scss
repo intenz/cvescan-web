@@ -1,0 +1,33 @@
+.cves-command {
+  &__box {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    background: var(--cves-surface2);
+    border: 1px solid var(--cves-border);
+    border-radius: 6px;
+    padding: 0.85rem 1rem;
+
+    code {
+      flex: 1;
+      white-space: pre-wrap;
+      word-break: break-word;
+      color: var(--cves-green);
+    }
+
+    button {
+      background: transparent;
+      border: 1px solid var(--cves-border2);
+      color: var(--cves-text-muted);
+      border-radius: 4px;
+      padding: 0.25rem 0.5rem;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+  }
+
+  &__hint {
+    margin: 0.5rem 0 0;
+    color: var(--cves-text-muted);
+  }
+}

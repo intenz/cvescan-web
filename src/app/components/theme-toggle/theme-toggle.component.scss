@@ -1,0 +1,19 @@
+.cves-theme {
+  display: inline-flex;
+  border: 1px solid var(--cves-border);
+  border-radius: 4px;
+  overflow: hidden;
+
+  button {
+    background: transparent;
+    border: 0;
+    color: var(--cves-text-muted);
+    padding: 0.3rem 0.55rem;
+    cursor: pointer;
+
+    &.is-active {
+      background: var(--cves-surface2);
+      color: var(--cves-text);
+    }
+  }
+}

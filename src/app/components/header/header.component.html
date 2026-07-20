@@ -1,0 +1,41 @@
+<header class="cves-header">
+  <a class="cves-header__brand" routerLink="/">
+    <span class="cves-header__logo">CVEScan</span>
+    <span class="cves-header__sub">/ runtime scanner</span>
+  </a>
+
+  <nav class="cves-header__nav" aria-label="Scan mode">
+    <button
+      type="button"
+      class="cves-header__nav-item"
+      [class.is-active]="mode() === 'local'"
+      (click)="setMode('local')"
+    >
+      Local program
+    </button>
+    <button
+      type="button"
+      class="cves-header__nav-item"
+      [class.is-active]="mode() === 'browser'"
+      (click)="setMode('browser')"
+    >
+      Browser
+    </button>
+    <button
+      type="button"
+      class="cves-header__nav-item"
+      [class.is-active]="mode() === 'network'"
+      (click)="setMode('network')"
+    >
+      Network
+    </button>
+  </nav>
+
+  <div class="cves-header__right">
+    <span class="cves-header__live"><i></i> NVD LIVE</span>
+    <cves-theme-toggle />
+    <a class="cves-header__api" routerLink="/external-api" routerLinkActive="is-active">
+      External API
+    </a>
+  </div>
+</header>

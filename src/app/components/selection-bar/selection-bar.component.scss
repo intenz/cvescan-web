@@ -1,0 +1,39 @@
+.cves-selection {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.75rem 1.25rem;
+  border-top: 1px solid var(--cves-border);
+  background: var(--cves-surface);
+
+  &__stats {
+    color: var(--cves-text-muted);
+
+    span {
+      color: var(--cves-text-dim);
+    }
+  }
+
+  &__actions {
+    display: flex;
+    gap: 0.5rem;
+
+    button {
+      border: 1px solid var(--cves-border2);
+      background: var(--cves-surface2);
+      color: var(--cves-text);
+      border-radius: 4px;
+      padding: 0.4rem 0.75rem;
+      cursor: pointer;
+    }
+  }
+
+  &__report {
+    background: var(--cves-red) !important;
+    border-color: var(--cves-red) !important;
+    color: #fff !important;
+    opacity: 0.85;
+  }
+}

@@ -1,0 +1,11 @@
+<ol class="cves-wizard">
+  @for (step of steps; track step; let i = $index) {
+    <li>
+      <span class="cves-wizard__num">{{ i + 1 }}</span>
+      {{ step }}
+      @if (!$last) {
+        <span class="cves-wizard__arrow">→</span>
+      }
+    </li>
+  }
+</ol>

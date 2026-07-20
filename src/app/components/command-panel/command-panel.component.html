@@ -1,0 +1,7 @@
+<section class="cves-command">
+  <div class="cves-command__box">
+    <code>{{ state.command() || 'Loading command…' }}</code>
+    <button type="button" (click)="copy()">{{ copied ? 'copied' : 'copy' }}</button>
+  </div>
+  <p class="cves-command__hint">↳ {{ state.hint() || 'Run the command, then upload the result file' }}</p>
+</section>

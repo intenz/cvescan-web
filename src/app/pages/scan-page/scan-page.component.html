@@ -1,0 +1,28 @@
+<section class="cves-scan">
+  <div class="cves-scan__strip">
+    <cves-scan-wizard />
+    <cves-os-tabs />
+    <cves-command-panel />
+    <cves-upload-zone />
+  </div>
+
+  @if (state.isExample()) {
+    <div class="cves-scan__banner">
+      ◈ Example data — upload your scan_results.txt to see matched CVEs for your system
+    </div>
+  }
+
+  <div class="cves-scan__main">
+    <div class="cves-scan__table">
+      <cves-cve-filters />
+      <cves-cve-table />
+      <p class="cves-scan__meta">
+        NVD data · {{ today() }} · No client data stored
+      </p>
+    </div>
+    <cves-cve-sidebar />
+  </div>
+
+  <cves-selection-bar />
+  <cves-copyright />
+</section>
