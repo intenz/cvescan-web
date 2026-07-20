@@ -7,7 +7,7 @@ Angular frontend for [cvescan.app](https://cvescan.app) — runtime CVE scanning
 ## Structure (product base)
 
 - Header: brand + External API
-- Navigation: Local program | Browser | Network
+- Navigation: Local Programs | Browser | Network
 - Command: macOS | Linux | Windows | iPhone | Android + copyable command
 - Upload: `scan_results.txt`
 - Content: CVE table with checkboxes

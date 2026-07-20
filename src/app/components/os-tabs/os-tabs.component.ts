@@ -14,15 +14,16 @@ export class OsTabsComponent {
   private readonly api = inject(ApiService);
 
   readonly os = this.state.os;
-  readonly options: { id: ScanOs; label: string }[] = [
-    { id: 'macos', label: 'macOS' },
+  readonly options: { id: ScanOs; label: string; soon?: boolean }[] = [
+    { id: 'macos', label: 'Mac OS' },
     { id: 'linux', label: 'Linux' },
     { id: 'windows', label: 'Windows' },
-    { id: 'iphone', label: 'iPhone' },
-    { id: 'android', label: 'Android' },
+    { id: 'iphone', label: 'iPhone', soon: true },
+    { id: 'android', label: 'Android', soon: true },
   ];
 
-  select(os: ScanOs): void {
+  select(os: ScanOs, soon?: boolean): void {
+    if (soon) return;
     this.state.setOs(os);
     this.api.loadCommand(this.state.mode(), os);
   }

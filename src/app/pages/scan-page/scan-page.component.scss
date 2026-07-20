@@ -10,6 +10,32 @@
     padding: 1rem 1.25rem;
     border-bottom: 1px solid var(--cves-border);
     background: var(--cves-surface);
+
+    &.is-collapsed {
+      gap: 0;
+    }
+  }
+
+  &__strip-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  &__collapse {
+    flex-shrink: 0;
+    background: transparent;
+    border: 1px solid var(--cves-border2);
+    color: var(--cves-text-muted);
+    border-radius: 4px;
+    padding: 0.3rem 0.65rem;
+    cursor: pointer;
+
+    &:hover {
+      color: var(--cves-text);
+      border-color: var(--cves-green);
+    }
   }
 
   &__banner {
@@ -24,9 +50,13 @@
   &__main {
     flex: 1;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 320px;
+    grid-template-columns: minmax(0, 1fr);
     gap: 1rem;
     padding: 1rem 1.25rem;
+
+    &.has-sidebar {
+      grid-template-columns: minmax(0, 1fr) 320px;
+    }
   }
 
   &__meta {
@@ -37,7 +67,7 @@
 }
 
 @media (max-width: 960px) {
-  .cves-scan__main {
+  .cves-scan__main.has-sidebar {
     grid-template-columns: 1fr;
   }
 }

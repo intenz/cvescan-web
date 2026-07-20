@@ -46,6 +46,22 @@
       color: var(--cves-text);
       border-bottom-color: var(--cves-green);
     }
+
+    &.is-soon,
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.45;
+      color: var(--cves-text-dim);
+
+      span {
+        margin-left: 0.35rem;
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--cves-amber);
+        opacity: 1;
+      }
+    }
   }
 
   &__right {
@@ -90,13 +106,13 @@
 
 @keyframes cves-pulse {
   0% {
-    box-shadow: 0 0 0 0 #00e67666;
+    box-shadow: 0 0 0 0 #008b5466;
   }
   70% {
-    box-shadow: 0 0 0 8px #00e67600;
+    box-shadow: 0 0 0 8px #008b5400;
   }
   100% {
-    box-shadow: 0 0 0 0 #00e67600;
+    box-shadow: 0 0 0 0 #008b5400;
   }
 }
 

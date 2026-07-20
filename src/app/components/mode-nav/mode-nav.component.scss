@@ -1,0 +1,22 @@
+.cves-mode-nav {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 0.75rem 1.25rem;
+  border-bottom: 1px solid var(--cves-border);
+  background: var(--cves-surface);
+
+  &__item {
+    background: none;
+    border: 0;
+    color: var(--cves-text-muted);
+    cursor: pointer;
+    padding: 0.35rem 0;
+    border-bottom: 2px solid transparent;
+
+    &.is-active {
+      color: var(--cves-text);
+      border-bottom-color: var(--cves-green);
+    }
+  }
+}

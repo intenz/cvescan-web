@@ -17,5 +17,19 @@
       border-color: var(--cves-green);
       font-weight: 600;
     }
+
+    &.is-soon,
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.45;
+
+      span {
+        margin-left: 0.3rem;
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--cves-amber);
+      }
+    }
   }
 }

@@ -11,23 +11,13 @@
       [class.is-active]="mode() === 'local'"
       (click)="setMode('local')"
     >
-      Local program
+      Local Programs
     </button>
-    <button
-      type="button"
-      class="cves-header__nav-item"
-      [class.is-active]="mode() === 'browser'"
-      (click)="setMode('browser')"
-    >
-      Browser
+    <button type="button" class="cves-header__nav-item is-soon" disabled title="Coming soon">
+      Browser <span>soon</span>
     </button>
-    <button
-      type="button"
-      class="cves-header__nav-item"
-      [class.is-active]="mode() === 'network'"
-      (click)="setMode('network')"
-    >
-      Network
+    <button type="button" class="cves-header__nav-item is-soon" disabled title="Coming soon">
+      Network <span>soon</span>
     </button>
   </nav>
 

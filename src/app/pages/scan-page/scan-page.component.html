@@ -1,9 +1,22 @@
 <section class="cves-scan">
-  <div class="cves-scan__strip">
-    <cves-scan-wizard />
-    <cves-os-tabs />
-    <cves-command-panel />
-    <cves-upload-zone />
+  <div class="cves-scan__strip" [class.is-collapsed]="state.stripCollapsed()">
+    <div class="cves-scan__strip-head">
+      <cves-scan-wizard />
+      <button
+        type="button"
+        class="cves-scan__collapse"
+        (click)="state.toggleStrip()"
+        [attr.aria-expanded]="!state.stripCollapsed()"
+      >
+        {{ state.stripCollapsed() ? 'Expand' : 'Collapse' }}
+      </button>
+    </div>
+
+    @if (!state.stripCollapsed()) {
+      <cves-os-tabs />
+      <cves-command-panel />
+      <cves-upload-zone />
+    }
   </div>
 
   @if (state.isExample()) {
@@ -12,7 +25,7 @@
     </div>
   }
 
-  <div class="cves-scan__main">
+  <div class="cves-scan__main" [class.has-sidebar]="state.sidebarOpen()">
     <div class="cves-scan__table">
       <cves-cve-filters />
       <cves-cve-table />
@@ -20,9 +33,13 @@
         NVD data · {{ today() }} · No client data stored
       </p>
     </div>
-    <cves-cve-sidebar />
+    @if (state.sidebarOpen()) {
+      <cves-cve-sidebar />
+    }
   </div>
 
-  <cves-selection-bar />
+  @if (state.selectedIds().size > 0) {
+    <cves-selection-bar />
+  }
   <cves-copyright />
 </section>

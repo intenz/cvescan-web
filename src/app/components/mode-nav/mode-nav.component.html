@@ -1,0 +1,26 @@
+<nav class="cves-mode-nav" aria-label="Scan mode">
+  <button
+    type="button"
+    class="cves-mode-nav__item"
+    [class.is-active]="mode() === 'local'"
+    (click)="setMode('local')"
+  >
+    Local Programs
+  </button>
+  <button
+    type="button"
+    class="cves-mode-nav__item"
+    [class.is-active]="mode() === 'browser'"
+    (click)="setMode('browser')"
+  >
+    Browser
+  </button>
+  <button
+    type="button"
+    class="cves-mode-nav__item"
+    [class.is-active]="mode() === 'network'"
+    (click)="setMode('network')"
+  >
+    Network
+  </button>
+</nav>

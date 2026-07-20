@@ -3,10 +3,16 @@
     <button
       type="button"
       role="tab"
-      [class.is-active]="os() === opt.id"
-      (click)="select(opt.id)"
+      [class.is-active]="os() === opt.id && !opt.soon"
+      [class.is-soon]="!!opt.soon"
+      [disabled]="!!opt.soon"
+      [title]="opt.soon ? 'Coming soon' : opt.label"
+      (click)="select(opt.id, opt.soon)"
     >
       {{ opt.label }}
+      @if (opt.soon) {
+        <span>soon</span>
+      }
     </button>
   }
 </div>

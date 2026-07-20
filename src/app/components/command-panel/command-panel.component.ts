@@ -15,6 +15,7 @@ export class CommandPanelComponent {
     const text = this.state.command();
     if (!text) return;
     await navigator.clipboard.writeText(text);
+    this.state.markCommandCopied();
     this.copied = true;
     setTimeout(() => (this.copied = false), 1500);
   }
