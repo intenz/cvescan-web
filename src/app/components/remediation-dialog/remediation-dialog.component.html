@@ -1,0 +1,140 @@
+<div
+  class="cves-rem-dialog"
+  role="presentation"
+  (click)="onBackdrop($event)"
+>
+  <div
+    #panel
+    class="cves-rem-dialog__panel"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="cves-rem-title"
+    tabindex="-1"
+  >
+    <div class="cves-rem-dialog__top">
+      <h2 id="cves-rem-title">Remediation</h2>
+      <button
+        type="button"
+        class="cves-rem-dialog__close"
+        aria-label="Close"
+        (click)="closed.emit()"
+      >
+        ✕
+      </button>
+    </div>
+
+    <p class="cves-rem-dialog__intro">
+      Update commands for curated products (Homebrew / apt / winget). Latest
+      versions are crawled from package indexes — not invented per CVE.
+      @if (showCombined()) {
+        Same-manager upgrades are merged into one command so you can update
+        several apps in a single run.
+      }
+    </p>
+
+    @if (showCombined()) {
+      <section class="cves-rem-dialog__combined" aria-label="Combined commands">
+        <h3 class="cves-rem-dialog__combined-title">Combined (run once)</h3>
+        @if (merged().macos; as cmd) {
+          <div class="cves-rem-dialog__cmd">
+            <div class="cves-rem-dialog__os">
+              <span>macOS</span>
+              <button type="button" (click)="copyCmd('merged:macos', cmd)">
+                {{ copiedKey === 'merged:macos' ? 'Copied' : 'Copy' }}
+              </button>
+            </div>
+            <pre>{{ cmd }}</pre>
+          </div>
+        }
+        @if (merged().linux; as cmd) {
+          <div class="cves-rem-dialog__cmd">
+            <div class="cves-rem-dialog__os">
+              <span>Linux</span>
+              <button type="button" (click)="copyCmd('merged:linux', cmd)">
+                {{ copiedKey === 'merged:linux' ? 'Copied' : 'Copy' }}
+              </button>
+            </div>
+            <pre>{{ cmd }}</pre>
+          </div>
+        }
+        @if (merged().windows; as cmd) {
+          <div class="cves-rem-dialog__cmd">
+            <div class="cves-rem-dialog__os">
+              <span>Windows</span>
+              <button type="button" (click)="copyCmd('merged:windows', cmd)">
+                {{ copiedKey === 'merged:windows' ? 'Copied' : 'Copy' }}
+              </button>
+            </div>
+            <pre>{{ cmd }}</pre>
+          </div>
+        }
+      </section>
+    }
+
+    <ul class="cves-rem-dialog__list">
+      @for (r of ui.items(); track r.productId) {
+        <li class="cves-rem-dialog__item">
+          <div class="cves-rem-dialog__head">
+            <h3>{{ r.productId }}</h3>
+            <span class="cves-rem-dialog__status">{{ patchLabel(r) }}</span>
+          </div>
+          <p class="cves-rem-dialog__vers">
+            Yours: {{ r.userVersion || '—' }}
+            · Tracked latest: {{ r.latestVersion || '—' }}
+          </p>
+
+          @if (!showCombined()) {
+            @if (r.commands.macos) {
+              <div class="cves-rem-dialog__cmd">
+                <div class="cves-rem-dialog__os">
+                  <span>macOS</span>
+                  <button
+                    type="button"
+                    (click)="copyCmd(r.productId + ':macos', r.commands.macos)"
+                  >
+                    {{
+                      copiedKey === r.productId + ':macos' ? 'Copied' : 'Copy'
+                    }}
+                  </button>
+                </div>
+                <pre>{{ r.commands.macos }}</pre>
+              </div>
+            }
+            @if (r.commands.linux) {
+              <div class="cves-rem-dialog__cmd">
+                <div class="cves-rem-dialog__os">
+                  <span>Linux</span>
+                  <button
+                    type="button"
+                    (click)="copyCmd(r.productId + ':linux', r.commands.linux)"
+                  >
+                    {{
+                      copiedKey === r.productId + ':linux' ? 'Copied' : 'Copy'
+                    }}
+                  </button>
+                </div>
+                <pre>{{ r.commands.linux }}</pre>
+              </div>
+            }
+            @if (r.commands.windows) {
+              <div class="cves-rem-dialog__cmd">
+                <div class="cves-rem-dialog__os">
+                  <span>Windows</span>
+                  <button
+                    type="button"
+                    (click)="copyCmd(r.productId + ':windows', r.commands.windows)"
+                  >
+                    {{
+                      copiedKey === r.productId + ':windows' ? 'Copied' : 'Copy'
+                    }}
+                  </button>
+                </div>
+                <pre>{{ r.commands.windows }}</pre>
+              </div>
+            }
+          }
+        </li>
+      }
+    </ul>
+  </div>
+</div>

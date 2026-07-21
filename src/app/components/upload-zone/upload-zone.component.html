@@ -1,30 +1,40 @@
 <div class="cves-upload-wrap">
-  <label class="cves-upload" [class.is-busy]="busy()">
-    <input
-      type="file"
-      [accept]="accept()"
-      (change)="onFile($event)"
-      [disabled]="busy()"
-    />
-    @if (busy()) {
-      <span class="cves-upload__pulse" aria-hidden="true"></span>
-      <span class="cves-upload__stage">
-        @for (s of [stage()]; track stageIndex()) {
-          <span class="cves-upload__stage-text">{{ s }}</span>
+  <div class="cves-upload-wrap__row">
+    <label class="cves-upload" [class.is-busy]="busy()">
+      <input
+        type="file"
+        [accept]="accept()"
+        (change)="onFile($event)"
+        [disabled]="busy()"
+      />
+      @if (busy()) {
+        <span class="cves-upload__pulse" aria-hidden="true"></span>
+        <span class="cves-upload__stage">
+          @for (s of [stage()]; track stageIndex()) {
+            <span class="cves-upload__stage-text">{{ s }}</span>
+          }
+        </span>
+      } @else {
+        <span>{{ label() }}</span>
+      }
+    </label>
+    <p class="cves-upload__format">
+      @if (isNetwork()) {
+        <strong>Format:</strong> nmap XML (<code>.xml</code> from <code>-oX</code>).
+        @if (skipStepsHint()) {
+          Already have <code>scan_results.xml</code>? Upload it here — no need to expand the steps.
         }
-      </span>
-    } @else {
-      <span>{{ label() }}</span>
-    }
-  </label>
+      } @else {
+        <strong>Format:</strong> plain-text inventory (<code>.txt</code>) — package/app names with
+        versions.
+        @if (skipStepsHint()) {
+          Already have <code>scan_results.txt</code>? Upload it here — no need to expand the steps.
+        }
+      }
+    </p>
+  </div>
   <p class="cves-upload__hint">
-    @if (isNetwork()) {
-      No client data stored. Upload nmap XML (<code>-oX</code>), get matched CVEs from NVD — your
-      <code>scan_results.xml</code> is not retained after the scan.
-    } @else {
-      No client data stored. Upload an inventory file, get matched CVEs from NVD — your
-      <code>scan_results.txt</code> is not retained after the scan.
-    }
+    No client data stored. Matched against NVD — your file is not retained after the scan.
   </p>
   @if (state.error()) {
     <p class="cves-upload__error">{{ state.error() }}</p>

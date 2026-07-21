@@ -3,11 +3,13 @@ import { isPlatformBrowser } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { CopyrightComponent } from './components/copyright/copyright.component';
 import { DataSourcesDialogComponent } from './components/data-sources-dialog/data-sources-dialog.component';
+import { RemediationDialogComponent } from './components/remediation-dialog/remediation-dialog.component';
 import { HeaderComponent } from './components/header/header.component';
 import { ThemeService } from './core/theme.service';
 import { AnalyticsService } from './core/analytics.service';
 import { ApiService } from './core/api.service';
 import { DataSourcesUiService } from './core/data-sources-ui.service';
+import { RemediationUiService } from './core/remediation-ui.service';
 import { ScanStateService } from './core/scan-state.service';
 
 @Component({
@@ -18,6 +20,7 @@ import { ScanStateService } from './core/scan-state.service';
     HeaderComponent,
     CopyrightComponent,
     DataSourcesDialogComponent,
+    RemediationDialogComponent,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
@@ -29,6 +32,7 @@ export class AppComponent implements OnInit {
   private readonly state = inject(ScanStateService);
   private readonly platformId = inject(PLATFORM_ID);
   readonly dataSources = inject(DataSourcesUiService);
+  readonly remediation = inject(RemediationUiService);
 
   constructor() {
     // Keep command text aligned with the active mode + OS tabs (header is global).

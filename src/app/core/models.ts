@@ -3,6 +3,19 @@ export type ScanOs = 'macos' | 'linux' | 'windows' | 'iphone' | 'android';
 export type Severity = 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW' | 'UNKNOWN';
 export type ThemeMode = 'dark' | 'light' | 'system';
 
+export interface RemediationPayload {
+  important: true;
+  productId: string;
+  userVersion: string | null;
+  latestVersion: string | null;
+  patchAvailable: boolean | null;
+  commands: {
+    macos: string | null;
+    linux: string | null;
+    windows: string | null;
+  };
+}
+
 export interface CveItem {
   cve_id: string;
   title: string;
@@ -21,6 +34,47 @@ export interface CveItem {
   /** Present on scan matches; optional on catalog rows. */
   affected_cpes?: string[];
   matched_cpes?: string[];
+  /** Curated product remediation from /scan (not catalog). */
+  remediation?: RemediationPayload;
 }
 
 export const EXAMPLE_CVES: CveItem[] = [];
+
+export function formatPatchLabel(
+  patch: boolean | null | undefined,
+  tracked = false,
+): string {
+  if (patch === true) return '✓ yes';
+  if (patch === false) return '✗ no';
+  // Tracked product, but no version to compare → unknown (not "untracked").
+  if (tracked) return '?';
+  return '—';
+}
+
+export function formatPatchShort(
+  patch: boolean | null | undefined,
+  tracked = false,
+): string {
+  if (patch === true) return 'yes';
+  if (patch === false) return 'no';
+  if (tracked) return '?';
+  return '—';
+}
+
+/** Deduplicate remediation payloads by productId (keep first). */
+export function uniqueRemediations(cves: CveItem[]): RemediationPayload[] {
+  const seen = new Set<string>();
+  const out: RemediationPayload[] = [];
+  for (const c of cves) {
+    const r = c.remediation;
+    if (!r) continue;
+    if (seen.has(r.productId)) continue;
+    seen.add(r.productId);
+    out.push(r);
+  }
+  return out;
+}
+
+export function hasRemediationCommands(r: RemediationPayload): boolean {
+  return Boolean(r.commands.macos || r.commands.linux || r.commands.windows);
+}

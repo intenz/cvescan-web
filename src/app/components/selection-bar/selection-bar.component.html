@@ -4,6 +4,9 @@
     <span>| {{ stats().critical }} critical | {{ stats().high }} high | avg {{ stats().avg }} cvss</span>
   </div>
   <div class="cves-selection__actions">
+    @if (canRemediate()) {
+      <button type="button" (click)="openRemediation()">Remediation</button>
+    }
     <button type="button" (click)="exportCsv()">Export CSV</button>
   </div>
 </footer>

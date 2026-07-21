@@ -30,9 +30,24 @@ interface CatalogResponse {
   page: number;
   limit: number;
   totalPages: number;
+  capped?: boolean;
   /** @deprecated Feeds moved to GET /feeds — kept optional for older API builds. */
   feeds?: LiveFeedStatus[];
-  meta?: { example?: boolean; cached?: boolean; message?: string };
+  meta?: {
+    example?: boolean;
+    cached?: boolean;
+    tracked?: boolean;
+    capped?: boolean;
+    message?: string;
+  };
+}
+
+interface CatalogSearchResponse {
+  q: string;
+  matchedBy: 'cve_id' | 'product' | 'description' | 'none';
+  cves: CveItem[];
+  total: number;
+  capped: boolean;
 }
 
 interface FeedsResponse {
@@ -129,12 +144,14 @@ export class ApiService {
     severity: Severity | 'ALL' = this.state.severityFilter(),
   ): void {
     this.state.loading.set(true);
+    const tracked = this.state.patchOnlyFilter();
     this.http
       .get<CatalogResponse>(`${this.base}/api/customer/catalog`, {
         params: {
           page: String(page),
           limit: String(this.state.pageSize),
           severity,
+          ...(tracked ? { tracked: '1' } : {}),
         },
         headers: this.headers(),
       })
@@ -146,7 +163,9 @@ export class ApiService {
             page: 1,
             limit: this.state.pageSize,
             totalPages: 1,
+            capped: false,
             feeds: [] as LiveFeedStatus[],
+            meta: {},
           }),
         ),
         tap({
@@ -155,6 +174,7 @@ export class ApiService {
               res.cves ?? [],
               res.total ?? 0,
               res.page ?? page,
+              Boolean(res.capped ?? res.meta?.capped),
             );
             if (res.feeds?.length) {
               this.state.setFeedStatus(res.feeds);
@@ -178,8 +198,71 @@ export class ApiService {
 
   setSeverity(filter: Severity | 'ALL'): void {
     this.state.setSeverityFilter(filter);
+    if (this.state.searchActive()) return;
     if (this.state.isExample()) {
       this.loadCatalog(1, filter);
+    }
+  }
+
+  /**
+   * Cascaded search: catalog via API; after a real scan — filter in-memory matches.
+   * Composes with severity + Patch filters (client-side on the hit list).
+   */
+  search(q: string): void {
+    const trimmed = q.trim();
+    const cveLike = /^cve-?\d{0,4}-?\d*$/i.test(trimmed.replace(/\s+/g, ''));
+    if (!trimmed || (trimmed.length < 2 && !cveLike)) {
+      this.clearSearch();
+      return;
+    }
+
+    if (!this.state.isExample()) {
+      // Prefer full scan pool (before patch/severity slice) so filters still compose.
+      const { cves, matchedBy, capped } = filterLocalMatches(
+        this.state.cves(),
+        trimmed,
+      );
+      this.state.setSearchResults(trimmed, cves, matchedBy, capped);
+      return;
+    }
+
+    this.state.loading.set(true);
+    this.http
+      .get<CatalogSearchResponse>(`${this.base}/api/customer/catalog/search`, {
+        params: { q: trimmed },
+        headers: this.headers(),
+      })
+      .pipe(
+        catchError(() =>
+          of({
+            q: trimmed,
+            matchedBy: 'none' as const,
+            cves: [] as CveItem[],
+            total: 0,
+            capped: false,
+          }),
+        ),
+        tap({
+          next: (res) => {
+            this.state.setSearchResults(
+              res.q ?? trimmed,
+              res.cves ?? [],
+              res.matchedBy ?? 'none',
+              Boolean(res.capped),
+            );
+            this.state.loading.set(false);
+          },
+          error: () => this.state.loading.set(false),
+        }),
+      )
+      .subscribe();
+  }
+
+  clearSearch(): void {
+    const wasSearching = this.state.searchActive();
+    this.state.clearSearch();
+    if (wasSearching && this.state.isExample()) {
+      this.loadCatalog(1);
     }
   }
 
@@ -339,7 +422,7 @@ export class ApiService {
 
     const local: Record<ScanOs, string> = {
       macos:
-        "system_profiler SPSoftwareDataType SPApplicationsDataType | grep -E 'Version|System Version|Location' > scan_results.txt",
+        "system_profiler SPSoftwareDataType SPApplicationsDataType | grep -E 'Version:|^    [^ ].*:$' > scan_results.txt",
       linux:
         "dpkg-query -W -f='${Package} ${Version}\\n' > scan_results.txt 2>/dev/null || rpm -qa > scan_results.txt",
       windows:
@@ -379,4 +462,60 @@ export class ApiService {
     }
     return hint;
   }
+}
+
+const LOCAL_SEARCH_LIMIT = 50;
+
+function looksLikeCveQuery(q: string): boolean {
+  return /^cve-?\d{0,4}-?\d*$/i.test(q.trim().replace(/\s+/g, ''));
+}
+
+function filterLocalMatches(
+  rows: CveItem[],
+  q: string,
+): {
+  cves: CveItem[];
+  matchedBy: 'cve_id' | 'product' | 'description' | 'none';
+  capped: boolean;
+} {
+  const trimmed = q.trim();
+  if (looksLikeCveQuery(trimmed)) {
+    const prefix = trimmed.toUpperCase().replace(/\s+/g, '').replace(/^CVE(?!-)/, 'CVE-');
+    const normalized = prefix === 'CVE' ? 'CVE-' : prefix;
+    const hits = rows
+      .filter((r) => r.cve_id.toUpperCase().startsWith(normalized))
+      .slice(0, LOCAL_SEARCH_LIMIT);
+    if (hits.length) {
+      return {
+        cves: hits,
+        matchedBy: 'cve_id',
+        capped: hits.length >= LOCAL_SEARCH_LIMIT,
+      };
+    }
+  }
+
+  const token = trimmed.toLowerCase();
+  const byProduct = rows
+    .filter((r) => (r.product ?? '').toLowerCase().includes(token))
+    .slice(0, LOCAL_SEARCH_LIMIT);
+  if (byProduct.length) {
+    return {
+      cves: byProduct,
+      matchedBy: 'product',
+      capped: byProduct.length >= LOCAL_SEARCH_LIMIT,
+    };
+  }
+
+  const byDesc = rows
+    .filter(
+      (r) =>
+        (r.title ?? '').toLowerCase().includes(token) ||
+        (r.description ?? '').toLowerCase().includes(token),
+    )
+    .slice(0, LOCAL_SEARCH_LIMIT);
+  return {
+    cves: byDesc,
+    matchedBy: byDesc.length ? 'description' : 'none',
+    capped: byDesc.length >= LOCAL_SEARCH_LIMIT,
+  };
 }

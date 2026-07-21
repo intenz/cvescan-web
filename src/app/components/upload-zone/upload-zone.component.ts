@@ -1,4 +1,4 @@
-import { Component, OnDestroy, computed, inject, signal } from '@angular/core';
+import { Component, OnDestroy, computed, inject, input, signal } from '@angular/core';
 import { ApiService } from '../../core/api.service';
 import { ScanStateService } from '../../core/scan-state.service';
 import { UPLOAD_STAGES } from '../../core/ui-motion';
@@ -12,6 +12,9 @@ import { UPLOAD_STAGES } from '../../core/ui-motion';
 export class UploadZoneComponent implements OnDestroy {
   private readonly api = inject(ApiService);
   readonly state = inject(ScanStateService);
+
+  /** Show “already have a file — no need to expand” (collapsed header only). */
+  readonly skipStepsHint = input(false);
 
   readonly busy = signal(false);
   readonly stage = signal<string>(UPLOAD_STAGES[0]);

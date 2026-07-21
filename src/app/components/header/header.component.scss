@@ -128,6 +128,22 @@
     animation: cves-live-fade 0.45s ease;
   }
 
+  &__live-q {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 0.95rem;
+    height: 0.95rem;
+    border-radius: 50%;
+    border: 1px solid color-mix(in srgb, var(--cves-green) 55%, transparent);
+    color: var(--cves-green);
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0;
+    line-height: 1;
+    opacity: 0.9;
+  }
+
   &__live-tip {
     position: absolute;
     top: calc(100% + 0.45rem);

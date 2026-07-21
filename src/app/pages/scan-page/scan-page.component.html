@@ -6,7 +6,11 @@
 
   <div class="cves-scan__strip" [class.is-collapsed]="state.stripCollapsed()">
     <div class="cves-scan__strip-head">
-      <cves-scan-wizard />
+      @if (state.stripCollapsed() && state.mode() !== 'browser') {
+        <cves-upload-zone [skipStepsHint]="true" />
+      } @else {
+        <cves-scan-wizard />
+      }
       <button
         type="button"
         class="cves-scan__collapse"

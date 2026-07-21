@@ -43,8 +43,12 @@ export class ScanStateService {
   /** Total rows in catalog (server-side). For scan results = filtered length. */
   readonly catalogTotal = signal(0);
   readonly activeCveId = signal<string | null>(null);
-  readonly selectedIds = signal<Set<string>>(new Set());
+  /** Selected CVE rows by id — survives catalog page changes. */
+  private readonly selectedMap = signal<Map<string, CveItem>>(new Map());
+  readonly selectedIds = computed(() => new Set(this.selectedMap().keys()));
   readonly severityFilter = signal<Severity | 'ALL'>('ALL');
+  /** When true, show only CVEs with patch_available === true (update available). */
+  readonly patchOnlyFilter = signal(false);
   readonly page = signal(1);
   readonly pageSize = 10;
   readonly command = signal('');
@@ -56,25 +60,69 @@ export class ScanStateService {
   /** ISO timestamps per feed — populated from API when available. */
   readonly feedLastUpdated = signal<Partial<Record<LiveFeedId, string | null>>>({});
 
+  /** Active catalog/scan search (empty = no search). */
+  readonly searchQuery = signal('');
+  /** Visible search box value (may differ briefly while typing a short query). */
+  readonly searchInput = signal('');
+  readonly searchHits = signal<CveItem[]>([]);
+  readonly searchMatchedBy = signal<'cve_id' | 'product' | 'description' | 'none' | null>(
+    null,
+  );
+  readonly searchCapped = signal(false);
+  /** Tracked/patch list hard-capped at 100 (catalog API or scan client). */
+  readonly patchCapped = signal(false);
+
+  readonly searchActive = computed(() => {
+    const q = this.searchQuery().trim();
+    if (!q) return false;
+    if (/^cve-?\d{0,4}-?\d*$/i.test(q.replace(/\s+/g, ''))) return true;
+    return q.length >= 2;
+  });
+
   /** When true, pagination is fetched from API (catalog preview). */
-  readonly serverPaging = computed(() => this.isExample());
+  readonly serverPaging = computed(
+    () => this.isExample() && !this.searchActive(),
+  );
 
   readonly activeCve = computed(() => {
     const id = this.activeCveId();
-    return this.cves().find((c) => c.cve_id === id) ?? null;
+    const pool = this.searchActive() ? this.searchHits() : this.cves();
+    return pool.find((c) => c.cve_id === id) ?? null;
   });
 
   /**
    * Scan results are sorted once in setResults; filter only.
    * Catalog preview is already one server page.
+   * Search hits are capped server/client-side (max 50).
+   * Patch/tracked hits are capped at 100 (then table shows 10/page).
    */
   readonly filteredCves = computed(() => {
-    if (this.serverPaging()) {
-      return this.cves();
-    }
     const filter = this.severityFilter();
-    if (filter === 'ALL') return this.cves();
-    return this.cves().filter((c) => c.severity === filter);
+    const patchOnly = this.patchOnlyFilter();
+    let rows = this.searchActive() ? this.searchHits() : this.cves();
+    if (!this.serverPaging() && filter !== 'ALL') {
+      rows = rows.filter((c) => c.severity === filter);
+    }
+    // 🔥 Patch = update available (patch_available === true), capped at 100.
+    // Catalog without search uses ?tracked=1 (server already keeps patch yes).
+    if (patchOnly && !this.serverPaging()) {
+      rows = rows
+        .filter((c) => c.patch_available === true)
+        .slice(0, 100);
+    }
+    return rows;
+  });
+
+  readonly patchListCapped = computed(() => {
+    if (!this.patchOnlyFilter()) return false;
+    if (this.serverPaging()) return this.patchCapped();
+    // Recompute uncapped length for scan/search
+    const filter = this.severityFilter();
+    let rows = this.searchActive() ? this.searchHits() : this.cves();
+    if (filter !== 'ALL') {
+      rows = rows.filter((c) => c.severity === filter);
+    }
+    return rows.filter((c) => c.patch_available === true).length > 100;
   });
 
   readonly totalCount = computed(() =>
@@ -95,10 +143,7 @@ export class ScanStateService {
     return this.filteredCves().slice(start, start + this.pageSize);
   });
 
-  readonly selectedCves = computed(() => {
-    const ids = this.selectedIds();
-    return this.cves().filter((c) => ids.has(c.cve_id));
-  });
+  readonly selectedCves = computed(() => [...this.selectedMap().values()]);
 
   /** 1-based current step; completed steps are indices < currentStep */
   readonly wizardStep = computed(() => {
@@ -189,28 +234,78 @@ export class ScanStateService {
     this.hint.set(hint);
   }
 
-  setCatalogPage(cves: CveItem[], total: number, page: number): void {
+  setCatalogPage(
+    cves: CveItem[],
+    total: number,
+    page: number,
+    capped = false,
+  ): void {
+    this.clearSearch();
     this.cves.set(cves);
     this.catalogTotal.set(total);
     this.isExample.set(true);
     this.uploaded.set(false);
+    this.patchCapped.set(capped);
     this.page.set(page);
-    this.selectedIds.set(new Set());
     this.closeSidebar();
   }
 
   setResults(cves: CveItem[], example = false): void {
+    this.resetListFilters();
     this.cves.set(example ? cves : sortByPublishedDesc(cves));
     this.isExample.set(example);
     this.uploaded.set(!example);
     this.catalogTotal.set(example ? cves.length : 0);
-    this.selectedIds.set(new Set());
+    this.clearSelection();
+    this.closeSidebar();
+  }
+
+  clearSelection(): void {
+    this.selectedMap.set(new Map());
+  }
+
+  /** Severity ALL, Patch off, search cleared — used after upload / new scan results. */
+  resetListFilters(): void {
+    this.clearSearch();
+    this.searchInput.set('');
+    this.severityFilter.set('ALL');
+    this.patchOnlyFilter.set(false);
+    this.patchCapped.set(false);
+    this.page.set(1);
+  }
+
+  setSearchResults(
+    q: string,
+    cves: CveItem[],
+    matchedBy: 'cve_id' | 'product' | 'description' | 'none',
+    capped: boolean,
+  ): void {
+    this.searchQuery.set(q);
+    this.searchInput.set(q);
+    this.searchHits.set(cves);
+    this.searchMatchedBy.set(matchedBy);
+    this.searchCapped.set(capped);
     this.page.set(1);
     this.closeSidebar();
   }
 
+  clearSearch(): void {
+    this.searchQuery.set('');
+    this.searchHits.set([]);
+    this.searchMatchedBy.set(null);
+    this.searchCapped.set(false);
+  }
+
   setSeverityFilter(filter: Severity | 'ALL'): void {
     this.severityFilter.set(filter);
+    this.page.set(1);
+  }
+
+  togglePatchOnlyFilter(): void {
+    this.patchOnlyFilter.update((v) => !v);
+    if (!this.patchOnlyFilter()) {
+      this.patchCapped.set(false);
+    }
     this.page.set(1);
   }
 
@@ -233,49 +328,59 @@ export class ScanStateService {
     this.stripCollapsed.update((v) => !v);
   }
 
+  private findCve(id: string): CveItem | null {
+    const pool = this.searchActive() ? this.searchHits() : this.cves();
+    return pool.find((c) => c.cve_id === id) ?? this.selectedMap().get(id) ?? null;
+  }
+
   toggleSelect(id: string): void {
-    const next = new Set(this.selectedIds());
-    if (next.has(id)) next.delete(id);
-    else next.add(id);
-    this.selectedIds.set(next);
+    const next = new Map(this.selectedMap());
+    if (next.has(id)) {
+      next.delete(id);
+    } else {
+      const cve = this.findCve(id);
+      if (!cve) return;
+      next.set(id, cve);
+    }
+    this.selectedMap.set(next);
   }
 
   toggleSelectAllFiltered(): void {
     const rows = this.pagedCves();
-    const ids = this.selectedIds();
+    const map = this.selectedMap();
     const allSelected =
-      rows.length > 0 && rows.every((c) => ids.has(c.cve_id));
+      rows.length > 0 && rows.every((c) => map.has(c.cve_id));
+    const next = new Map(map);
     if (allSelected) {
-      const next = new Set(ids);
       for (const row of rows) next.delete(row.cve_id);
-      this.selectedIds.set(next);
-      return;
+    } else {
+      for (const row of rows) next.set(row.cve_id, row);
     }
-    const next = new Set(ids);
-    for (const row of rows) next.add(row.cve_id);
-    this.selectedIds.set(next);
+    this.selectedMap.set(next);
   }
 
   isAllFilteredSelected(): boolean {
     const rows = this.pagedCves();
     if (!rows.length) return false;
-    const ids = this.selectedIds();
-    return rows.every((c) => ids.has(c.cve_id));
+    const map = this.selectedMap();
+    return rows.every((c) => map.has(c.cve_id));
   }
 
   isSomeFilteredSelected(): boolean {
     const rows = this.pagedCves();
-    const ids = this.selectedIds();
-    const count = rows.filter((c) => ids.has(c.cve_id)).length;
+    const map = this.selectedMap();
+    const count = rows.filter((c) => map.has(c.cve_id)).length;
     return count > 0 && count < rows.length;
   }
 
   selectActive(): void {
     const id = this.activeCveId();
     if (!id) return;
-    const next = new Set(this.selectedIds());
-    next.add(id);
-    this.selectedIds.set(next);
+    const cve = this.findCve(id);
+    if (!cve) return;
+    const next = new Map(this.selectedMap());
+    next.set(id, cve);
+    this.selectedMap.set(next);
   }
 
   setFeedStatus(feeds: LiveFeedStatus[]): void {

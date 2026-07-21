@@ -6,3 +6,6 @@
 @if (dataSources.open()) {
   <cves-data-sources-dialog (closed)="dataSources.hide()" />
 }
+@if (remediation.open()) {
+  <cves-remediation-dialog (closed)="remediation.hide()" />
+}

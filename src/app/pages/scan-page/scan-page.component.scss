@@ -24,6 +24,7 @@
   }
 
   &__strip {
+    position: relative;
     display: flex;
     flex-direction: column;
     gap: 0.85rem;
@@ -39,9 +40,18 @@
 
   &__strip-head {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    align-items: flex-start;
+    justify-content: flex-start;
     gap: 1rem;
+    /* Reserve room so content never sits under the pinned Expand/Collapse control */
+    padding-right: 7.25rem;
+    min-height: 2rem;
+
+    > cves-upload-zone,
+    > cves-scan-wizard {
+      flex: 1;
+      min-width: 0;
+    }
   }
 
   &__strip-body {
@@ -63,6 +73,13 @@
   }
 
   &__collapse {
+    position: absolute;
+    top: 1rem;
+    right: 1.25rem;
+    z-index: 2;
+    box-sizing: border-box;
+    width: 6.5rem;
+    justify-content: center;
     flex-shrink: 0;
     display: inline-flex;
     align-items: center;
@@ -71,13 +88,12 @@
     border: 1px solid var(--cves-border2);
     color: var(--cves-text-muted);
     border-radius: 4px;
-    padding: 0.3rem 0.65rem;
+    padding: 0.3rem 0.5rem;
     cursor: pointer;
     transition:
       color 0.2s ease,
       border-color 0.2s ease,
-      background 0.2s ease,
-      transform 0.2s ease;
+      background 0.2s ease;
 
     &:hover {
       color: var(--cves-text);
@@ -86,7 +102,7 @@
     }
 
     &:active {
-      transform: scale(0.97);
+      background: var(--cves-green-dim);
     }
   }
 
