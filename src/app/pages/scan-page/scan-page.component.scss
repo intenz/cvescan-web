@@ -117,7 +117,11 @@
     grid-template-columns: minmax(0, 1fr) auto;
     gap: 1rem;
     padding: 1rem 1.25rem;
-    align-items: start;
+    align-items: stretch;
+  }
+
+  &__table {
+    min-width: 0;
   }
 
   &__meta {

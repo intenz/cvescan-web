@@ -43,13 +43,6 @@
       }
     }
   }
-
-  &__report {
-    background: var(--cves-red) !important;
-    border-color: var(--cves-red) !important;
-    color: #fff !important;
-    opacity: 0.85;
-  }
 }
 
 @keyframes cves-footer-up {
