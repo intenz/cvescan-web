@@ -35,11 +35,11 @@
   @if (state.isExample()) {
     <div class="cves-scan__banner">
       @if (state.mode() === 'browser') {
-        ◈ Catalog preview ({{ state.totalCount() }} CVEs) — enter a website URL to probe stack signals
+        ◈ Catalog preview in our DB ({{ state.totalCount() }} CVEs) — enter a website URL to probe stack signals
       } @else if (state.mode() === 'network') {
-        ◈ Catalog preview ({{ state.totalCount() }} CVEs) — upload nmap scan_results.xml to match exposed services
+        ◈ Catalog preview in our DB ({{ state.totalCount() }} CVEs) — upload nmap scan_results.xml to match exposed services
       } @else {
-        ◈ Catalog preview ({{ state.totalCount() }} CVEs) — upload scan_results.txt to see matches for your system
+        ◈ Catalog preview in our DB ({{ state.totalCount() }} CVEs) — upload scan_results.txt to see matches for your system
       }
     </div>
   } @else if (state.mode() === 'browser' && state.detectedStack().length) {
