@@ -1,6 +1,7 @@
 import { Component, OnInit, PLATFORM_ID, effect, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
+import { CopyrightComponent } from './components/copyright/copyright.component';
 import { HeaderComponent } from './components/header/header.component';
 import { ThemeService } from './core/theme.service';
 import { AnalyticsService } from './core/analytics.service';
@@ -10,7 +11,7 @@ import { ScanStateService } from './core/scan-state.service';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, HeaderComponent],
+  imports: [RouterOutlet, HeaderComponent, CopyrightComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })

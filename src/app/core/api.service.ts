@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable, catchError, map, of, tap, timeout } from 'rxjs';
+import { Observable, catchError, map, of, tap, timeout, type OperatorFunction } from 'rxjs';
 import { environment } from '../../environments/environment';
 import type { CveItem, ScanMode, ScanOs, Severity } from './models';
 import type { LiveFeedStatus } from './live-feeds';
@@ -204,7 +204,7 @@ export class ApiService {
       .get<EngagementResponse>(`${this.base}/api/customer/engagement`, {
         headers: this.headers(),
       })
-      .pipe(catchError(() => of({ visits: 0, likes: 0 })));
+      .pipe(this.engagementFallback());
   }
 
   recordVisit(): Observable<EngagementResponse> {
@@ -214,7 +214,7 @@ export class ApiService {
         { action: 'visit' },
         { headers: this.headers() },
       )
-      .pipe(catchError(() => of({ visits: 0, likes: 0 })));
+      .pipe(this.engagementFallback());
   }
 
   recordLike(): Observable<EngagementResponse> {
@@ -224,7 +224,14 @@ export class ApiService {
         { action: 'like' },
         { headers: this.headers() },
       )
-      .pipe(catchError(() => of({ visits: 0, likes: 0 })));
+      .pipe(this.engagementFallback());
+  }
+
+  private engagementFallback(): OperatorFunction<
+    EngagementResponse,
+    EngagementResponse
+  > {
+    return catchError(() => of({ visits: 0, likes: 0 }));
   }
 
   uploadScan(file: File, mode: ScanMode, os: ScanOs): Observable<CveItem[]> {

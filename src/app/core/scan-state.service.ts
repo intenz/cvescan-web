@@ -8,6 +8,7 @@ import {
   type ScanOs,
   type Severity,
 } from './models';
+import { normalizeOsForMode } from './normalize-os';
 import { modeInfo } from './seo-content';
 
 const PREFS_KEY = 'cves-scan-prefs';
@@ -18,6 +19,12 @@ type ScanPrefs = {
   mode?: ScanMode;
   os?: ScanOs;
 };
+
+function sortByPublishedDesc(cves: CveItem[]): CveItem[] {
+  return [...cves].sort((a, b) =>
+    (b.published ?? '').localeCompare(a.published ?? ''),
+  );
+}
 
 @Injectable({ providedIn: 'root' })
 export class ScanStateService {
@@ -57,19 +64,17 @@ export class ScanStateService {
     return this.cves().find((c) => c.cve_id === id) ?? null;
   });
 
-  /** For scan results: filter + sort client-side. Catalog: already one server page. */
+  /**
+   * Scan results are sorted once in setResults; filter only.
+   * Catalog preview is already one server page.
+   */
   readonly filteredCves = computed(() => {
     if (this.serverPaging()) {
       return this.cves();
     }
     const filter = this.severityFilter();
-    const list =
-      filter === 'ALL'
-        ? [...this.cves()]
-        : this.cves().filter((c) => c.severity === filter);
-    return list.sort((a, b) =>
-      (b.published ?? '').localeCompare(a.published ?? ''),
-    );
+    if (filter === 'ALL') return this.cves();
+    return this.cves().filter((c) => c.severity === filter);
   });
 
   readonly totalCount = computed(() =>
@@ -123,11 +128,7 @@ export class ScanStateService {
         restored.mode = true;
       }
       if (data.os && OSES.includes(data.os)) {
-        let os = data.os;
-        if (this.mode() !== 'local' && (os === 'iphone' || os === 'android')) {
-          os = 'macos';
-        }
-        this.os.set(os);
+        this.os.set(normalizeOsForMode(this.mode(), data.os));
         restored.os = true;
       }
     } catch {
@@ -140,13 +141,7 @@ export class ScanStateService {
     this.mode.set(mode);
     this.error.set(null);
     this.commandCopied.set(false);
-    // Mobile OS tabs exist only in Local Programs.
-    if (mode !== 'local') {
-      const os = this.os();
-      if (os === 'iphone' || os === 'android') {
-        this.os.set('macos');
-      }
-    }
+    this.os.set(normalizeOsForMode(mode, this.os()));
     if (mode === 'browser') {
       this.siteEntered.set(false);
       this.siteUrl.set('');
@@ -205,7 +200,7 @@ export class ScanStateService {
   }
 
   setResults(cves: CveItem[], example = false): void {
-    this.cves.set(cves);
+    this.cves.set(example ? cves : sortByPublishedDesc(cves));
     this.isExample.set(example);
     this.uploaded.set(!example);
     this.catalogTotal.set(example ? cves.length : 0);

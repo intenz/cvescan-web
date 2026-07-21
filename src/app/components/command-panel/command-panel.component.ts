@@ -1,4 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
+import { copyText } from '../../core/copy-text';
 import { ScanStateService } from '../../core/scan-state.service';
 import type { ScanOs } from '../../core/models';
 
@@ -31,7 +32,7 @@ export class CommandPanelComponent {
     const text = this.state.command().trim();
     if (!text) return;
 
-    const ok = await this.writeClipboard(text);
+    const ok = await copyText(text);
     if (!ok) {
       this.copyFailed.set(true);
       window.setTimeout(() => this.copyFailed.set(false), 2000);
@@ -42,36 +43,5 @@ export class CommandPanelComponent {
     this.copied.set(true);
     this.copyFailed.set(false);
     window.setTimeout(() => this.copied.set(false), 1500);
-  }
-
-  private async writeClipboard(text: string): Promise<boolean> {
-    try {
-      if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(text);
-        return true;
-      }
-    } catch {
-      /* fall through to legacy path */
-    }
-    return this.fallbackCopy(text);
-  }
-
-  private fallbackCopy(text: string): boolean {
-    try {
-      const ta = document.createElement('textarea');
-      ta.value = text;
-      ta.setAttribute('readonly', '');
-      ta.style.position = 'fixed';
-      ta.style.top = '0';
-      ta.style.left = '-9999px';
-      document.body.appendChild(ta);
-      ta.focus();
-      ta.select();
-      const ok = document.execCommand('copy');
-      document.body.removeChild(ta);
-      return ok;
-    } catch {
-      return false;
-    }
   }
 }

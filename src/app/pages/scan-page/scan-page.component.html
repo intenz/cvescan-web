@@ -1,7 +1,7 @@
 <section class="cves-scan">
-  <h1 class="cves-scan__title">{{ modeInfo(state.mode()).h1 }}</h1>
+  <h1 class="cves-scan__title">{{ currentModeInfo().h1 }}</h1>
   <p class="cves-scan__tagline">
-    {{ modeInfo(state.mode()).description }}
+    {{ currentModeInfo().description }}
   </p>
 
   <div class="cves-scan__strip" [class.is-collapsed]="state.stripCollapsed()">
@@ -56,7 +56,7 @@
       <cves-cve-filters />
       <cves-cve-table />
       <p class="cves-scan__meta">
-        NVD data · {{ today() }} · No client data stored
+        NVD data · {{ today }} · No client data stored
       </p>
     </div>
     <cves-cve-sidebar />
@@ -65,6 +65,5 @@
   @if (state.selectedIds().size > 0) {
     <cves-selection-bar />
   }
-  <cves-copyright />
   <cves-seo-crawl />
 </section>

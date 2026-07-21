@@ -1,7 +1,5 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { CopyrightComponent } from '../../components/copyright/copyright.component';
-import { SeoService } from '../../core/seo.service';
-import { EXTERNAL_API_SEO } from '../../core/seo-content';
+import { copyText } from '../../core/copy-text';
 import {
   EXTERNAL_API_BASE,
   EXTERNAL_API_BENEFITS,
@@ -11,11 +9,13 @@ import {
   type ApiEndpointDoc,
   type CodeLang,
 } from '../../core/external-api-docs';
+import { EXTERNAL_API_SEO } from '../../core/seo-content';
+import { SeoService, applyPageSeo } from '../../core/seo.service';
 
 @Component({
   selector: 'cves-external-api-page',
   standalone: true,
-  imports: [CopyrightComponent],
+  imports: [],
   templateUrl: './external-api-page.component.html',
   styleUrl: './external-api-page.component.scss',
 })
@@ -31,11 +31,7 @@ export class ExternalApiPageComponent implements OnInit {
   readonly copiedId = signal<string | null>(null);
 
   ngOnInit(): void {
-    this.seo.apply({
-      title: EXTERNAL_API_SEO.title,
-      description: EXTERNAL_API_SEO.description,
-      canonical: EXTERNAL_API_SEO.canonical,
-    });
+    applyPageSeo(this.seo, EXTERNAL_API_SEO);
   }
 
   setLang(lang: CodeLang): void {
@@ -54,11 +50,8 @@ export class ExternalApiPageComponent implements OnInit {
   async copyExample(ep: ApiEndpointDoc): Promise<void> {
     const text = this.exampleFor(ep);
     if (!text) return;
-    try {
-      await navigator.clipboard.writeText(text);
-    } catch {
-      return;
-    }
+    const ok = await copyText(text);
+    if (!ok) return;
     this.copiedId.set(ep.id);
     window.setTimeout(() => {
       if (this.copiedId() === ep.id) this.copiedId.set(null);

@@ -10,6 +10,20 @@ export interface PageSeo {
   jsonLd?: Record<string, unknown>[];
 }
 
+/** Apply SEO from a page content object (title/description/canonical + optional jsonLd). */
+export function applyPageSeo(
+  seo: SeoService,
+  page: Pick<PageSeo, 'title' | 'description' | 'canonical'>,
+  jsonLd?: Record<string, unknown>[],
+): void {
+  seo.apply({
+    title: page.title,
+    description: page.description,
+    canonical: page.canonical,
+    jsonLd,
+  });
+}
+
 @Injectable({ providedIn: 'root' })
 export class SeoService {
   private readonly title = inject(Title);

@@ -1,13 +1,12 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { CopyrightComponent } from '../../components/copyright/copyright.component';
-import { SeoService } from '../../core/seo.service';
+import { SeoService, applyPageSeo } from '../../core/seo.service';
 import { FAQ_ITEMS, FAQ_SEO, faqPageJsonLd } from '../../core/seo-content';
 
 @Component({
   selector: 'cves-faq-page',
   standalone: true,
-  imports: [CopyrightComponent, RouterLink],
+  imports: [RouterLink],
   templateUrl: './faq-page.component.html',
   styleUrl: './faq-page.component.scss',
 })
@@ -18,11 +17,6 @@ export class FaqPageComponent implements OnInit {
   readonly faq = FAQ_ITEMS;
 
   ngOnInit(): void {
-    this.seo.apply({
-      title: FAQ_SEO.title,
-      description: FAQ_SEO.description,
-      canonical: FAQ_SEO.canonical,
-      jsonLd: [faqPageJsonLd()],
-    });
+    applyPageSeo(this.seo, FAQ_SEO, [faqPageJsonLd()]);
   }
 }

@@ -33,6 +33,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly platformId = inject(PLATFORM_ID);
   private feedTimer: ReturnType<typeof setInterval> | null = null;
+  private readonly onVisibility = (): void => this.syncFeedTimer();
 
   readonly modes = SCAN_MODES;
   readonly mode = this.state.mode;
@@ -56,13 +57,14 @@ export class HeaderComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     if (!isPlatformBrowser(this.platformId)) return;
     this.api.loadFeedStatus();
-    this.feedTimer = setInterval(() => {
-      this.feedIndex.update((i) => (i + 1) % this.feedDefinitions.length);
-    }, 2800);
+    document.addEventListener('visibilitychange', this.onVisibility);
+    this.syncFeedTimer();
   }
 
   ngOnDestroy(): void {
-    if (this.feedTimer) clearInterval(this.feedTimer);
+    if (!isPlatformBrowser(this.platformId)) return;
+    document.removeEventListener('visibilitychange', this.onVisibility);
+    this.stopFeedTimer();
   }
 
   setMode(mode: ScanMode): void {
@@ -71,5 +73,23 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.state.setMode(mode);
     // Mode UI lives on the scan page — leave FAQ / External API when switching.
     void this.router.navigateByUrl('/');
+  }
+
+  private syncFeedTimer(): void {
+    if (document.hidden) {
+      this.stopFeedTimer();
+      return;
+    }
+    if (this.feedTimer) return;
+    this.feedTimer = setInterval(() => {
+      this.feedIndex.update((i) => (i + 1) % this.feedDefinitions.length);
+    }, 2800);
+  }
+
+  private stopFeedTimer(): void {
+    if (this.feedTimer) {
+      clearInterval(this.feedTimer);
+      this.feedTimer = null;
+    }
   }
 }
