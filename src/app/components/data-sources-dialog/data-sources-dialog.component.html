@@ -1,0 +1,44 @@
+<div
+  class="cves-ds-dialog"
+  role="presentation"
+  (click)="onBackdrop($event)"
+  (keydown)="onKeydown($event)"
+>
+  <div
+    #panel
+    class="cves-ds-dialog__panel"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="cves-ds-title"
+    tabindex="-1"
+  >
+    <div class="cves-ds-dialog__top">
+      <h2 id="cves-ds-title">Data sources &amp; licenses</h2>
+      <button
+        type="button"
+        class="cves-ds-dialog__close"
+        aria-label="Close"
+        (click)="closed.emit()"
+      >
+        ✕
+      </button>
+    </div>
+
+    <p class="cves-ds-dialog__intro">{{ intro }}</p>
+
+    <ul class="cves-ds-dialog__list">
+      @for (n of notices; track n.id) {
+        <li class="cves-ds-dialog__item">
+          <h3>{{ n.title }}</h3>
+          <p>{{ n.summary }}</p>
+          <p class="cves-ds-dialog__req">{{ n.requirement }}</p>
+          <a [href]="n.linkHref" target="_blank" rel="noopener noreferrer">{{
+            n.linkLabel
+          }}</a>
+        </li>
+      }
+    </ul>
+
+    <p class="cves-ds-dialog__foot">{{ footer }}</p>
+  </div>
+</div>

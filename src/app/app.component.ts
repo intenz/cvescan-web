@@ -2,16 +2,23 @@ import { Component, OnInit, PLATFORM_ID, effect, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { CopyrightComponent } from './components/copyright/copyright.component';
+import { DataSourcesDialogComponent } from './components/data-sources-dialog/data-sources-dialog.component';
 import { HeaderComponent } from './components/header/header.component';
 import { ThemeService } from './core/theme.service';
 import { AnalyticsService } from './core/analytics.service';
 import { ApiService } from './core/api.service';
+import { DataSourcesUiService } from './core/data-sources-ui.service';
 import { ScanStateService } from './core/scan-state.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, HeaderComponent, CopyrightComponent],
+  imports: [
+    RouterOutlet,
+    HeaderComponent,
+    CopyrightComponent,
+    DataSourcesDialogComponent,
+  ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })
@@ -21,6 +28,7 @@ export class AppComponent implements OnInit {
   private readonly api = inject(ApiService);
   private readonly state = inject(ScanStateService);
   private readonly platformId = inject(PLATFORM_ID);
+  readonly dataSources = inject(DataSourcesUiService);
 
   constructor() {
     // Keep command text aligned with the active mode + OS tabs (header is global).

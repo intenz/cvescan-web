@@ -18,6 +18,7 @@ import {
 import { SCAN_MODES, modeInfo } from '../../core/seo-content';
 import { ScanStateService } from '../../core/scan-state.service';
 import { ApiService } from '../../core/api.service';
+import { DataSourcesUiService } from '../../core/data-sources-ui.service';
 import { ThemeToggleComponent } from '../theme-toggle/theme-toggle.component';
 
 @Component({
@@ -32,6 +33,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   private readonly api = inject(ApiService);
   private readonly router = inject(Router);
   private readonly platformId = inject(PLATFORM_ID);
+  private readonly dataSources = inject(DataSourcesUiService);
   private feedTimer: ReturnType<typeof setInterval> | null = null;
   private readonly onVisibility = (): void => this.syncFeedTimer();
 
@@ -73,6 +75,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.state.setMode(mode);
     // Mode UI lives on the scan page — leave FAQ / External API when switching.
     void this.router.navigateByUrl('/');
+  }
+
+  openDataSources(): void {
+    this.dataSources.show();
   }
 
   private syncFeedTimer(): void {

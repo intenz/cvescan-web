@@ -30,8 +30,9 @@ interface CatalogResponse {
   page: number;
   limit: number;
   totalPages: number;
-  /** Optional per-feed sync timestamps from catalog API. */
+  /** @deprecated Feeds moved to GET /feeds — kept optional for older API builds. */
   feeds?: LiveFeedStatus[];
+  meta?: { example?: boolean; cached?: boolean; message?: string };
 }
 
 interface FeedsResponse {
@@ -217,14 +218,13 @@ export class ApiService {
       .pipe(this.engagementFallback());
   }
 
+  /** Must not swallow errors — callers persist "liked" only on real success. */
   recordLike(): Observable<EngagementResponse> {
-    return this.http
-      .post<EngagementResponse>(
-        `${this.base}/api/customer/engagement/like`,
-        { action: 'like' },
-        { headers: this.headers() },
-      )
-      .pipe(this.engagementFallback());
+    return this.http.post<EngagementResponse>(
+      `${this.base}/api/customer/engagement/like`,
+      { action: 'like' },
+      { headers: this.headers() },
+    );
   }
 
   private engagementFallback(): OperatorFunction<

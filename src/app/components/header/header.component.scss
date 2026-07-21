@@ -84,11 +84,16 @@
     align-items: center;
     gap: 0.4rem;
     position: relative;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
     color: var(--cves-green);
     font-size: 0.75rem;
     letter-spacing: 0.04em;
     flex-shrink: 0;
-    cursor: help;
+    cursor: pointer;
 
     &:hover,
     &:focus-visible {
@@ -161,6 +166,14 @@
     color: var(--cves-green);
     font-size: 0.68rem;
     letter-spacing: 0.02em;
+  }
+
+  &__live-tip-more {
+    margin-top: 0.15rem;
+    padding-top: 0.3rem;
+    border-top: 1px solid var(--cves-border);
+    color: var(--cves-text-muted);
+    font-size: 0.65rem;
   }
 
   &__link {

@@ -18,6 +18,9 @@ export interface CveItem {
   references: string[];
   kev: boolean;
   nuclei_template_url: string | null;
+  /** Present on scan matches; optional on catalog rows. */
+  affected_cpes?: string[];
+  matched_cpes?: string[];
 }
 
 export const EXAMPLE_CVES: CveItem[] = [];

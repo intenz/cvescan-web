@@ -77,5 +77,6 @@ export class ScanPageComponent implements OnInit {
     }
 
     this.api.loadCatalog();
+    this.api.loadFeedStatus();
   }
 }

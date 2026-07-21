@@ -28,6 +28,23 @@
     }
   }
 
+  &__linkbtn {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    color: var(--cves-text-muted);
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: var(--cves-green);
+    }
+  }
+
   &__engage {
     display: inline-flex;
     align-items: center;
@@ -82,6 +99,12 @@
   &__visits {
     font-size: 0.85rem;
     color: var(--cves-text-dim);
+    white-space: nowrap;
+  }
+
+  &__err {
+    font-size: 0.8rem;
+    color: var(--cves-amber, #c9a227);
     white-space: nowrap;
   }
 }

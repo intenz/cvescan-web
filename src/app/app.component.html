@@ -3,3 +3,6 @@
   <router-outlet />
 </main>
 <cves-copyright />
+@if (dataSources.open()) {
+  <cves-data-sources-dialog (closed)="dataSources.hide()" />
+}

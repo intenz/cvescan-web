@@ -3,6 +3,10 @@
     <p>
       © Viktor Hnativ {{ year }} · AI based ·
       <a href="https://cvescan.app">cvescan.app</a>
+      ·
+      <button type="button" class="cves-copy__linkbtn" (click)="openDataSources()">
+        Data sources
+      </button>
     </p>
     <p>
       <a href="https://www.linkedin.com/in/viktor-hnativ-968355110" target="_blank" rel="noopener"
@@ -33,6 +37,9 @@
       <span>{{ liked() ? 'Liked' : 'Like' }}</span>
       <strong>{{ formatCount(likes()) }}</strong>
     </button>
+    @if (likeError()) {
+      <span class="cves-copy__err" role="status">Couldn’t save like — try again</span>
+    }
     <span class="cves-copy__visits" title="Counted once per browser session">
       {{ formatCount(visits()) }} unique users
     </span>
