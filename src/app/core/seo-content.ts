@@ -72,7 +72,7 @@ export function modeSeo(mode: ScanMode): {
 export const HOME_SEO = {
   title: 'CVEScan — Runtime CVE Scanner | CPE → CVE for Installed Software',
   description:
-    'Runtime CVE scanner: paste OS command output, match installed software via CPE → CVE against NVD. Find unpatched CVEs on macOS, Linux, and Windows — no client data stored. Browser & Network scans coming soon.',
+    'Free runtime CVE scanner: upload installed software, nmap XML, or check a public site. Match product → CPE → CVE against NVD. macOS, Linux, Windows — no account, no client data stored.',
   canonical: `${SITE_URL}/`,
   ogImage: `${SITE_URL}/og-image.png`,
   h1: 'Runtime CVE scanner for installed software',
@@ -91,7 +91,7 @@ export const EXTERNAL_API_SEO = {
 export const FAQ_SEO = {
   title: 'CVEScan FAQ — CPE → CVE Matching, Privacy & Scan Modes',
   description:
-    'Answers about CVEScan: how CPE to CVE matching works, uploading scan_results.txt safely, supported OS platforms, NVD / VulnCheck / CISA KEV data, and upcoming Browser and Network modes.',
+    'Answers about CVEScan: how CPE to CVE matching works, uploading scan_results.txt safely, Local / Browser / Network modes, supported OS platforms, and NVD / VulnCheck / CISA KEV data.',
   canonical: `${SITE_URL}/faq`,
   h1: 'Frequently asked questions',
   lead: 'How CVEScan works, what data we use, and what happens when you upload an inventory file.',
@@ -164,7 +164,7 @@ export const FAQ_ITEMS: FaqItem[] = [
   {
     question: 'Do I need an account or API key to use the website scanner?',
     answer:
-      'No account is required for the public Local Programs flow: pick OS, run the command, upload scan_results.txt, and view matches. The External API is a separate commercial CPE → CVE matching interface for integrations and requires an API key. Contact support@cvescan.app if you need API access.',
+      'No account is required for the public scanners: Local Programs (inventory upload), Browser (public URL), and Network (nmap XML). Pick a mode, follow the steps, and view matches. The External API is a separate commercial CPE → CVE matching interface for integrations and requires an API key. Contact support@cvescan.app if you need API access.',
   },
   {
     question: 'What file format should I upload?',

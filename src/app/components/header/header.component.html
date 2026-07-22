@@ -1,7 +1,7 @@
 <header class="cves-header">
   <a class="cves-header__brand" routerLink="/">
     <span class="cves-header__logo">CVEScan</span>
-    <span class="cves-header__sub">/ Best runtime scanner</span>
+    <span class="cves-header__sub">/ Free Runtime Scanner</span>
   </a>
 
   <div class="cves-header__modes">
@@ -36,10 +36,8 @@
     <button
       type="button"
       class="cves-header__live"
-      [attr.aria-label]="
-        liveLabel() + '. ' + liveUpdatedLabel() + '. Open data sources and licenses'
-      "
-      [title]="liveTooltip() + ' · Click for licenses'"
+      [attr.aria-label]="liveLabel() + '. ' + liveUpdatedLabel()"
+      [title]="liveTooltip()"
       (click)="openDataSources()"
     >
       <i aria-hidden="true"></i>
@@ -52,7 +50,6 @@
       <span class="cves-header__live-tip" role="tooltip">
         <span class="cves-header__live-tip-desc">{{ activeFeed().description }}</span>
         <span class="cves-header__live-tip-time">{{ liveUpdatedLabel() }}</span>
-        <span class="cves-header__live-tip-more">Click for data sources &amp; licenses</span>
       </span>
     </button>
     <cves-theme-toggle />
