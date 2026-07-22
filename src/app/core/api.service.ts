@@ -42,9 +42,17 @@ interface CatalogResponse {
   };
 }
 
+type SearchMatchedBy =
+  | 'cve_id'
+  | 'product'
+  | 'version'
+  | 'description'
+  | 'date'
+  | 'none';
+
 interface CatalogSearchResponse {
   q: string;
-  matchedBy: 'cve_id' | 'product' | 'description' | 'none';
+  matchedBy: SearchMatchedBy;
   cves: CveItem[];
   total: number;
   capped: boolean;
@@ -480,12 +488,55 @@ function looksLikeCveQuery(q: string): boolean {
   return /^cve-?\d{0,4}-?\d*$/i.test(q.trim().replace(/\s+/g, ''));
 }
 
+function isYearToken(t: string): boolean {
+  return /^(19|20)\d{2}$/.test(t);
+}
+
+function isVersionToken(t: string): boolean {
+  return /^\d+(\.\d+){0,5}$/.test(t) && !isYearToken(t);
+}
+
+function parseLocalSearchQuery(q: string): {
+  productPhrase: string;
+  version: string | null;
+  year: string | null;
+} {
+  const phrase = q.trim().toLowerCase().replace(/\s+/g, ' ');
+  const tokens = phrase.split(' ').filter(Boolean);
+  const versionTokens = tokens.filter(isVersionToken);
+  const yearTokens = tokens.filter(isYearToken);
+  const productTokens = tokens.filter(
+    (t) => t.length >= 2 && !isVersionToken(t) && !isYearToken(t),
+  );
+  return {
+    productPhrase: productTokens.join(' '),
+    version:
+      versionTokens.sort((a, b) => b.length - a.length || b.localeCompare(a))[0] ??
+      null,
+    year: yearTokens[0] ?? null,
+  };
+}
+
+function versionFieldMatches(row: CveItem, version: string): boolean {
+  const v = version.toLowerCase();
+  return (
+    (row.version ?? '').toLowerCase().includes(v) ||
+    (row.title ?? '').toLowerCase().includes(v) ||
+    (row.description ?? '').toLowerCase().includes(v)
+  );
+}
+
+function publishedInYear(row: CveItem, year: string): boolean {
+  const published = row.published ?? '';
+  return published.startsWith(year);
+}
+
 function filterLocalMatches(
   rows: CveItem[],
   q: string,
 ): {
   cves: CveItem[];
-  matchedBy: 'cve_id' | 'product' | 'description' | 'none';
+  matchedBy: SearchMatchedBy;
   capped: boolean;
 } {
   const trimmed = q.trim().replace(/\s+/g, ' ');
@@ -504,15 +555,53 @@ function filterLocalMatches(
     }
   }
 
-  const byProduct = rows
-    .filter((r) => productFieldMatches(r.product ?? '', trimmed))
-    .slice(0, LOCAL_SEARCH_LIMIT);
-  if (byProduct.length) {
-    return {
-      cves: byProduct,
-      matchedBy: 'product',
-      capped: byProduct.length >= LOCAL_SEARCH_LIMIT,
-    };
+  const parsed = parseLocalSearchQuery(trimmed);
+
+  if (parsed.productPhrase) {
+    const byProduct = rows
+      .filter((r) => {
+        if (!productFieldMatches(r.product ?? '', parsed.productPhrase)) return false;
+        if (parsed.version && !versionFieldMatches(r, parsed.version)) return false;
+        if (parsed.year && !publishedInYear(r, parsed.year)) return false;
+        return true;
+      })
+      .slice(0, LOCAL_SEARCH_LIMIT);
+    if (byProduct.length) {
+      return {
+        cves: byProduct,
+        matchedBy: parsed.version ? 'version' : 'product',
+        capped: byProduct.length >= LOCAL_SEARCH_LIMIT,
+      };
+    }
+  }
+
+  if (parsed.version && !parsed.productPhrase) {
+    const byVersion = rows
+      .filter((r) => versionFieldMatches(r, parsed.version!))
+      .slice(0, LOCAL_SEARCH_LIMIT);
+    if (byVersion.length) {
+      return {
+        cves: byVersion,
+        matchedBy: 'version',
+        capped: byVersion.length >= LOCAL_SEARCH_LIMIT,
+      };
+    }
+  }
+
+  const yearOnly =
+    Boolean(parsed.year) && !parsed.productPhrase && !parsed.version;
+
+  if (yearOnly && parsed.year) {
+    const byDate = rows
+      .filter((r) => publishedInYear(r, parsed.year!))
+      .slice(0, LOCAL_SEARCH_LIMIT);
+    if (byDate.length) {
+      return {
+        cves: byDate,
+        matchedBy: 'date',
+        capped: byDate.length >= LOCAL_SEARCH_LIMIT,
+      };
+    }
   }
 
   const phrase = trimmed.toLowerCase();

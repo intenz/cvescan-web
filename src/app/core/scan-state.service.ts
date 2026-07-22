@@ -65,9 +65,9 @@ export class ScanStateService {
   /** Visible search box value (may differ briefly while typing a short query). */
   readonly searchInput = signal('');
   readonly searchHits = signal<CveItem[]>([]);
-  readonly searchMatchedBy = signal<'cve_id' | 'product' | 'description' | 'none' | null>(
-    null,
-  );
+  readonly searchMatchedBy = signal<
+    'cve_id' | 'product' | 'version' | 'description' | 'date' | 'none' | null
+  >(null);
   readonly searchCapped = signal(false);
   /** Tracked/patch list hard-capped at 100 (catalog API or scan client). */
   readonly patchCapped = signal(false);
@@ -277,7 +277,7 @@ export class ScanStateService {
   setSearchResults(
     q: string,
     cves: CveItem[],
-    matchedBy: 'cve_id' | 'product' | 'description' | 'none',
+    matchedBy: 'cve_id' | 'product' | 'version' | 'description' | 'date' | 'none',
     capped: boolean,
   ): void {
     this.searchQuery.set(q);
