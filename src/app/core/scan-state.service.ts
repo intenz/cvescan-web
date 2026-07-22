@@ -76,7 +76,7 @@ export class ScanStateService {
   readonly searchCapped = signal(false);
   /** Tracked/patch CVE list hard-capped at 100 (catalog API or scan client). */
   readonly patchCapped = signal(false);
-  /** Severity browse list hard-capped at 500. */
+  /** Catalog browse capped flag (legacy; severity no longer preloads a 500-row list). */
   readonly catalogCapped = signal(false);
   /** Latest support crawl (`supported_targets.synced_at`) for Patch tooltip. */
   readonly supportSyncedAt = signal<string | null>(null);
