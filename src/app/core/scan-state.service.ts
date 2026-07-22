@@ -37,7 +37,11 @@ export class ScanStateService {
   readonly uploaded = signal(false);
   readonly siteEntered = signal(false);
   readonly siteUrl = signal('');
-  readonly detectedStack = signal<Array<{ name: string; version?: string }>>([]);
+  readonly detectedStack = signal<
+    Array<{ name: string; version?: string; port?: string }>
+  >([]);
+  /** Total parsed apps when banner is capped (Local Programs). */
+  readonly detectedTotal = signal(0);
   readonly siteIps = signal<string[]>([]);
   readonly cves = signal<CveItem[]>(EXAMPLE_CVES);
   readonly isExample = signal(true);
@@ -70,8 +74,10 @@ export class ScanStateService {
     'cve_id' | 'product' | 'version' | 'description' | 'date' | 'none' | null
   >(null);
   readonly searchCapped = signal(false);
-  /** Tracked/patch list hard-capped at 100 (catalog API or scan client). */
+  /** Tracked/patch CVE list hard-capped at 100 (catalog API or scan client). */
   readonly patchCapped = signal(false);
+  /** Latest support crawl (`supported_targets.synced_at`) for Patch tooltip. */
+  readonly supportSyncedAt = signal<string | null>(null);
 
   constructor() {
     if (isPlatformBrowser(this.platformId)) {
@@ -217,6 +223,7 @@ export class ScanStateService {
     this.siteEntered.set(false);
     this.siteUrl.set('');
     this.detectedStack.set([]);
+    this.detectedTotal.set(0);
     this.siteIps.set([]);
     this.uploaded.set(false);
     this.stripCollapsed.set(false);
@@ -240,7 +247,20 @@ export class ScanStateService {
   ): void {
     this.siteUrl.set(url);
     this.detectedStack.set(detected);
+    this.detectedTotal.set(detected.length);
     this.siteIps.set(ips);
+    this.setResults(cves, false);
+  }
+
+  setUploadResults(
+    cves: CveItem[],
+    detected: Array<{ name: string; version?: string; port?: string }>,
+    detectedTotal?: number,
+  ): void {
+    this.siteUrl.set('');
+    this.siteIps.set([]);
+    this.detectedStack.set(detected);
+    this.detectedTotal.set(detectedTotal ?? detected.length);
     this.setResults(cves, false);
   }
 
@@ -424,5 +444,10 @@ export class ScanStateService {
       next[feed.id] = feed.lastUpdated;
     }
     this.feedLastUpdated.set(next);
+  }
+
+  setSupportSyncedAt(iso: string | null | undefined): void {
+    if (iso === undefined) return;
+    this.supportSyncedAt.set(iso);
   }
 }

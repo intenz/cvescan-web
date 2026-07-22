@@ -35,7 +35,14 @@ export class SiteScanComponent {
   constructor() {
     effect(() => {
       const site = this.state.siteUrl();
-      if (site) this.url.set(site);
+      if (site) {
+        this.url.set(site);
+        return;
+      }
+      // Cleared scan session — reset the input.
+      if (!this.state.siteEntered()) {
+        this.url.set('');
+      }
     });
   }
 
@@ -45,10 +52,7 @@ export class SiteScanComponent {
     this.busy.set(true);
     this.state.markSiteEntered();
     this.api.scanSiteUrl(value).subscribe({
-      next: () => {
-        this.busy.set(false);
-        this.state.stripCollapsed.set(true);
-      },
+      next: () => this.busy.set(false),
       error: () => this.busy.set(false),
     });
   }

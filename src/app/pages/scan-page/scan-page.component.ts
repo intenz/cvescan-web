@@ -67,16 +67,27 @@ export class ScanPageComponent implements OnInit {
   readonly home = HOME_SEO;
   readonly today = new Date().toISOString().slice(0, 10);
   readonly currentModeInfo = computed(() => modeInfo(this.state.mode()));
+
+  /** All modes: counts only (no app name list). */
   readonly detectedLabel = computed(() => {
-    const parts = this.state
-      .detectedStack()
-      .map((p) => (p.version ? `${p.name} ${p.version}` : p.name));
-    const ips = this.state.siteIps();
-    if (ips.length) {
-      parts.push(`IP ${ips[0]}${ips.length > 1 ? ` (+${ips.length - 1})` : ''}`);
-    }
-    return parts.join(' · ');
+    const apps = this.state.detectedTotal() || this.state.detectedStack().length;
+    const cves = this.state.cves().length;
+    const unit =
+      this.state.mode() === 'network'
+        ? 'services'
+        : this.state.mode() === 'browser'
+          ? 'products'
+          : 'apps';
+    return `Checked ${apps} ${unit} · ${cves} CVEs`;
   });
+
+  readonly showDetectedBanner = computed(
+    () =>
+      this.state.detectedTotal() > 0 ||
+      this.state.detectedStack().length > 0 ||
+      this.state.cves().length > 0 ||
+      this.state.siteIps().length > 0,
+  );
 
   ngOnInit(): void {
     if (!isPlatformBrowser(this.platformId)) {
@@ -115,6 +126,11 @@ export class ScanPageComponent implements OnInit {
     }
 
     this.api.loadFeedStatus();
+  }
+
+  clearResults(): void {
+    this.state.clearScanSession();
+    this.api.loadCatalog(1);
   }
 
   private applyMode(mode: ScanMode, loadCatalog: boolean): void {

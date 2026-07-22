@@ -50,15 +50,23 @@
         ◈ Catalog preview in our DB ({{ state.totalCount() }} CVEs) — upload scan_results.txt to see matches for your system
       }
     </div>
-  } @else if (
-    state.mode() === 'browser' &&
-    (state.detectedStack().length || state.siteIps().length)
-  ) {
-    <div class="cves-scan__banner">
-      Detected: {{ detectedLabel() }}
-      @if (state.siteUrl()) {
-        · {{ state.siteUrl() }}
-      }
+  } @else if (!state.isExample()) {
+    <div class="cves-scan__banner cves-scan__banner--results">
+      <span class="cves-scan__banner-text">
+        @if (showDetectedBanner()) {
+          {{ detectedLabel() }}
+        } @else {
+          Scan results
+        }
+      </span>
+      <button
+        type="button"
+        class="cves-scan__clear"
+        (click)="clearResults()"
+        title="Clear scan results and return to catalog preview"
+      >
+        Clear
+      </button>
     </div>
   }
 

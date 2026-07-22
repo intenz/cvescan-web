@@ -126,6 +126,61 @@
     color: var(--cves-amber);
     border: 1px solid #ffa00044;
     animation: cves-fade-up 0.4s ease;
+
+    &--results {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem 1rem;
+      min-height: 2.35rem;
+    }
+  }
+
+  &__banner-text {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.3;
+  }
+
+  &__clear {
+    flex-shrink: 0;
+    margin: 0;
+    padding: 0.25rem 0.65rem;
+    border: 1px solid #ffa00066;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--cves-amber);
+    font: inherit;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+      background 0.15s ease,
+      border-color 0.15s ease,
+      color 0.15s ease;
+
+    &:hover {
+      background: #ffa00022;
+      border-color: var(--cves-amber);
+      color: var(--cves-text);
+    }
+  }
+
+  @media (max-width: 640px) {
+    &__banner--results {
+      align-items: flex-start;
+      min-height: 0;
+    }
+
+    &__banner-text {
+      white-space: normal;
+      overflow: visible;
+      text-overflow: unset;
+      line-height: 1.45;
+    }
   }
 
   &__main {

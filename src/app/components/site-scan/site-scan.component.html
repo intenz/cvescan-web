@@ -27,7 +27,7 @@
     @if (compact()) {
       Probe another public URL here — no need to expand the steps.
     } @else {
-      We probe public HTTP headers, HTML signals, DNS/TLS (and Shodan if configured) — no login, no crawl of private pages.
+      Need a public <code>https://</code> URL. We probe headers, HTML, DNS/TLS — no login, no private pages.
     }
   </p>
   @if (state.error(); as err) {

@@ -23,12 +23,13 @@
     } @else {
       <p class="cves-upload__format">
         @if (isNetwork()) {
-          <strong>Format:</strong> nmap XML (<code>.xml</code> from <code>-oX</code>).
+          <strong>Need:</strong> nmap <code>-oX scan_results.xml</code> with a target at the end
+          (e.g. <code>192.168.0.0/24</code> or <code>192.168.0.10</code>).
           @if (skipStepsHint()) {
-            Already have <code>scan_results.xml</code>? Upload it here — no need to expand the steps.
+            Already have the file? Upload it here — no need to expand the steps.
           }
         } @else {
-          <strong>Format:</strong> plain-text inventory (<code>.txt</code>) — package/app names with
+          <strong>Need:</strong> plain-text inventory (<code>.txt</code>) — package/app names with
           versions.
           @if (skipStepsHint()) {
             Already have <code>scan_results.txt</code>? Upload it here — no need to expand the steps.

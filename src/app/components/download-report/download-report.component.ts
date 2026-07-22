@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { ApiService } from '../../core/api.service';
 import { ScanStateService } from '../../core/scan-state.service';
 
@@ -9,11 +9,11 @@ import { ScanStateService } from '../../core/scan-state.service';
     <button
       type="button"
       class="cves-download-report"
-      title="Download CSV report with all matched CVEs"
-      [disabled]="busy()"
+      [title]="title()"
+      [disabled]="busy() || !cveCount()"
       (click)="download()"
     >
-      {{ busy() ? 'Preparing…' : 'Download scan report' }}
+      {{ label() }}
     </button>
   `,
   styles: `
@@ -44,7 +44,7 @@ import { ScanStateService } from '../../core/scan-state.service';
       }
 
       &:disabled {
-        cursor: wait;
+        cursor: not-allowed;
         opacity: 0.7;
       }
     }
@@ -54,6 +54,21 @@ export class DownloadReportComponent {
   private readonly api = inject(ApiService);
   private readonly state = inject(ScanStateService);
   readonly busy = signal(false);
+
+  readonly cveCount = computed(() => this.state.cves().length);
+
+  readonly label = computed(() => {
+    if (this.busy()) return 'Preparing…';
+    const n = this.cveCount();
+    return n ? `Download report (${n} CVEs)` : 'Download report';
+  });
+
+  readonly title = computed(() => {
+    const n = this.cveCount();
+    return n
+      ? `Download CSV with all ${n} matched CVEs`
+      : 'Download CSV report with matched CVEs';
+  });
 
   download(): void {
     const rows = this.state.cves();

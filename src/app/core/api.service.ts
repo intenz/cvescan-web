@@ -13,6 +13,8 @@ interface CommandResponse {
 
 interface ScanResponse {
   cves: CveItem[];
+  detected?: Array<{ name: string; version?: string; port?: string }>;
+  detectedTotal?: number;
 }
 
 interface SiteScanResponse {
@@ -61,6 +63,8 @@ interface CatalogSearchResponse {
 
 interface FeedsResponse {
   feeds: LiveFeedStatus[];
+  /** Max supported_targets.synced_at from support crawl. */
+  supportSyncedAt?: string | null;
 }
 
 interface EngagementResponse {
@@ -296,11 +300,14 @@ export class ApiService {
         headers: this.headers(),
       })
       .pipe(
-        catchError(() => of({ feeds: [] as LiveFeedStatus[] })),
+        catchError(() =>
+          of({ feeds: [] as LiveFeedStatus[], supportSyncedAt: null }),
+        ),
         tap((res) => {
           if (res.feeds?.length) {
             this.state.setFeedStatus(res.feeds);
           }
+          this.state.setSupportSyncedAt(res.supportSyncedAt ?? null);
         }),
       )
       .subscribe();
@@ -354,10 +361,22 @@ export class ApiService {
         headers: this.headers(),
       })
       .pipe(
-        map((res) => res.cves ?? []),
+        map((res) => res),
         tap({
-          next: (cves) => {
-            this.state.setResults(cves, false);
+          next: (res) => {
+            const cves = res.cves ?? [];
+            if (mode === 'network' || mode === 'local') {
+              this.state.setUploadResults(
+                cves,
+                res.detected ?? [],
+                res.detectedTotal,
+              );
+            } else {
+              this.state.detectedStack.set([]);
+              this.state.detectedTotal.set(0);
+              this.state.siteIps.set([]);
+              this.state.setResults(cves, false);
+            }
             this.state.loading.set(false);
           },
           error: (err) => {
@@ -367,6 +386,7 @@ export class ApiService {
             );
           },
         }),
+        map((res) => res.cves ?? []),
       );
   }
 
@@ -491,7 +511,7 @@ export class ApiService {
     }
 
     if (mode === 'network') {
-      return 'nmap -sV -oX scan_results.xml localhost';
+      return 'nmap -sV -sC --top-ports 1000 -oX scan_results.xml 192.168.0.0/24';
     }
 
     const local: Record<ScanOs, string> = {
@@ -513,7 +533,7 @@ export class ApiService {
       return 'Quit browsers first if a DB is locked. Merges last 7 days from installed browsers → upload scan_results.txt';
     }
     if (mode === 'network') {
-      return 'Requires nmap. Writes XML → upload scan_results.xml';
+      return 'Requires nmap. Replace 192.168.0.0/24 with your LAN (or a single host like 192.168.0.10). Only scan networks you own → upload scan_results.xml';
     }
     if (os === 'iphone') {
       return 'Beta — works only from a MacBook. Phone must be connected by USB. Then run the command and upload scan_results.txt';
