@@ -1,0 +1,77 @@
+<div
+  class="cves-donate-dialog"
+  role="presentation"
+  (click)="onBackdrop($event)"
+  (keydown)="onKeydown($event)"
+>
+  <div
+    #panel
+    class="cves-donate-dialog__panel"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="cves-donate-title"
+    tabindex="-1"
+  >
+    <div class="cves-donate-dialog__top">
+      <h2 id="cves-donate-title">Support CVEScan</h2>
+      <button
+        type="button"
+        class="cves-donate-dialog__close"
+        aria-label="Close"
+        (click)="closed.emit()"
+      >
+        ✕
+      </button>
+    </div>
+
+    <p class="cves-donate-dialog__intro">{{ intro }}</p>
+
+    <ul class="cves-donate-dialog__list">
+      @for (o of options; track o.id) {
+        <li class="cves-donate-dialog__item">
+          <h3>{{ o.title }}</h3>
+          <p>{{ o.summary }}</p>
+          @if (o.kind === 'link') {
+            <a [href]="o.linkHref" target="_blank" rel="noopener noreferrer">{{
+              o.linkLabel
+            }}</a>
+          } @else if (o.kind === 'paypal') {
+            <div
+              class="cves-donate-dialog__paypal"
+              [class.is-ready]="paypalReady()"
+            >
+              <div [id]="paypalContainerId(o)"></div>
+              @if (!paypalReady() && !paypalFailed()) {
+                <p class="cves-donate-dialog__paypal-status">Loading PayPal…</p>
+              }
+              @if (paypalFailed()) {
+                <a
+                  [href]="o.linkHref"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >Open PayPal donate page</a
+                >
+              }
+            </div>
+          } @else {
+            <div class="cves-donate-dialog__crypto">
+              <code class="cves-donate-dialog__address" [title]="o.address">{{
+                o.address
+              }}</code>
+              <button
+                type="button"
+                class="cves-donate-dialog__copy"
+                [attr.aria-label]="'Copy ' + o.network + ' address'"
+                (click)="copyAddress(o)"
+              >
+                {{ copiedId() === o.id ? 'Copied' : 'Copy' }}
+              </button>
+            </div>
+          }
+        </li>
+      }
+    </ul>
+
+    <p class="cves-donate-dialog__foot">{{ footer }}</p>
+  </div>
+</div>

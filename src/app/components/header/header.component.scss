@@ -220,6 +220,43 @@
     }
   }
 
+  &__donate,
+  &__discord {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    margin: 0;
+    padding: 0;
+    border: 1px solid var(--cves-border2);
+    border-radius: 4px;
+    background: transparent;
+    color: var(--cves-text-muted);
+    cursor: pointer;
+    text-decoration: none;
+    transition:
+      border-color 0.2s ease,
+      color 0.2s ease;
+
+    svg {
+      display: block;
+    }
+
+    &:hover,
+    &:focus-visible {
+      border-color: var(--cves-green);
+      color: var(--cves-green);
+      text-decoration: none;
+    }
+  }
+
+  &__discord:hover,
+  &__discord:focus-visible {
+    border-color: #5865f2;
+    color: #5865f2;
+  }
+
   &__api {
     display: inline-flex;
     align-items: center;
@@ -253,18 +290,18 @@
 
 @keyframes cves-pulse {
   0% {
-    box-shadow: 0 0 0 0 #008b5466;
+    box-shadow: 0 0 0 0 #00a86166;
     opacity: 1;
   }
   50% {
     opacity: 0.45;
   }
   70% {
-    box-shadow: 0 0 0 8px #008b5400;
+    box-shadow: 0 0 0 8px #00a86100;
     opacity: 1;
   }
   100% {
-    box-shadow: 0 0 0 0 #008b5400;
+    box-shadow: 0 0 0 0 #00a86100;
     opacity: 1;
   }
 }

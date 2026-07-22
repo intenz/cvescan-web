@@ -6,6 +6,9 @@
 @if (dataSources.open()) {
   <cves-data-sources-dialog (closed)="dataSources.hide()" />
 }
+@if (donate.open()) {
+  <cves-donate-dialog (closed)="donate.hide()" />
+}
 @if (remediation.open()) {
   <cves-remediation-dialog (closed)="remediation.hide()" />
 }

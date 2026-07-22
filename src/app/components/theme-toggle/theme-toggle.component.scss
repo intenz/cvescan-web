@@ -5,14 +5,28 @@
   overflow: hidden;
 
   button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.85rem;
+    height: 1.85rem;
+    padding: 0;
     background: transparent;
     border: 0;
     color: var(--cves-text-muted);
-    padding: 0.3rem 0.55rem;
     cursor: pointer;
+
+    svg {
+      display: block;
+    }
 
     &.is-active {
       background: var(--cves-surface2);
+      color: var(--cves-text);
+    }
+
+    &:hover,
+    &:focus-visible {
       color: var(--cves-text);
     }
   }

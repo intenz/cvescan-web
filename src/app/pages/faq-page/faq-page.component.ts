@@ -1,5 +1,11 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import {
+  DISCORD_FAQ_BODY,
+  DISCORD_FAQ_CTA,
+  DISCORD_FAQ_TITLE,
+  DISCORD_INVITE_URL,
+} from '../../core/community';
 import { SeoService, applyPageSeo } from '../../core/seo.service';
 import { FAQ_ITEMS, FAQ_SEO, faqPageJsonLd } from '../../core/seo-content';
 
@@ -15,6 +21,10 @@ export class FaqPageComponent implements OnInit {
 
   readonly page = FAQ_SEO;
   readonly faq = FAQ_ITEMS;
+  readonly discordUrl = DISCORD_INVITE_URL;
+  readonly discordTitle = DISCORD_FAQ_TITLE;
+  readonly discordBody = DISCORD_FAQ_BODY;
+  readonly discordCta = DISCORD_FAQ_CTA;
 
   ngOnInit(): void {
     applyPageSeo(this.seo, FAQ_SEO, [faqPageJsonLd()]);

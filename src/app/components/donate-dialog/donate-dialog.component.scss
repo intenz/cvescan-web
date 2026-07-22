@@ -1,0 +1,164 @@
+.cves-donate-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: color-mix(in srgb, var(--cves-bg, #0d1110) 55%, transparent);
+  backdrop-filter: blur(2px);
+}
+
+.cves-donate-dialog__panel {
+  width: min(480px, 100%);
+  max-height: min(82vh, 640px);
+  overflow: auto;
+  overscroll-behavior: contain;
+  background: var(--cves-surface);
+  border: 1px solid var(--cves-border);
+  border-radius: 8px;
+  padding: 1.1rem 1.15rem 1.25rem;
+  box-shadow: 0 12px 40px color-mix(in srgb, #000 35%, transparent);
+  outline: none;
+}
+
+.cves-donate-dialog__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.65rem;
+
+  h2 {
+    margin: 0;
+    font-size: 1.05rem;
+    color: var(--cves-green);
+  }
+}
+
+.cves-donate-dialog__close {
+  flex-shrink: 0;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 4px;
+  border: 1px solid var(--cves-border2);
+  background: transparent;
+  color: var(--cves-text-muted);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--cves-text);
+    border-color: var(--cves-text-muted);
+  }
+}
+
+.cves-donate-dialog__intro {
+  margin: 0 0 1rem;
+  font-size: 0.84rem;
+  line-height: 1.5;
+  color: var(--cves-text-muted);
+}
+
+.cves-donate-dialog__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.cves-donate-dialog__item {
+  border: 1px solid var(--cves-border);
+  border-radius: 6px;
+  background: var(--cves-surface2);
+  padding: 0.7rem 0.8rem;
+
+  h3 {
+    margin: 0 0 0.35rem;
+    font-size: 0.82rem;
+    color: var(--cves-text);
+  }
+
+  p {
+    margin: 0 0 0.55rem;
+    font-size: 0.78rem;
+    line-height: 1.45;
+    color: var(--cves-text-muted);
+  }
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--cves-green);
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.cves-donate-dialog__paypal {
+  min-height: 2.5rem;
+
+  &:not(.is-ready) {
+    .cves-donate-dialog__paypal-status {
+      margin: 0;
+      font-size: 0.75rem;
+      color: var(--cves-text-dim);
+    }
+  }
+}
+
+.cves-donate-dialog__paypal-status {
+  margin: 0.35rem 0 0;
+}
+
+.cves-donate-dialog__crypto {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.cves-donate-dialog__address {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: var(--cves-text);
+  background: var(--cves-surface);
+  border: 1px solid var(--cves-border);
+  border-radius: 4px;
+  padding: 0.35rem 0.45rem;
+}
+
+.cves-donate-dialog__copy {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0.35rem 0.55rem;
+  border: 1px solid var(--cves-border2);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--cves-green);
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--cves-green);
+  }
+}
+
+.cves-donate-dialog__foot {
+  margin: 1rem 0 0;
+  font-size: 0.75rem;
+  color: var(--cves-text-dim, var(--cves-text-muted));
+}

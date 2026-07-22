@@ -19,6 +19,8 @@ import { SCAN_MODES, modeInfo } from '../../core/seo-content';
 import { ScanStateService } from '../../core/scan-state.service';
 import { ApiService } from '../../core/api.service';
 import { DataSourcesUiService } from '../../core/data-sources-ui.service';
+import { DonateUiService } from '../../core/donate-ui.service';
+import { DISCORD_INVITE_URL } from '../../core/community';
 import { ThemeToggleComponent } from '../theme-toggle/theme-toggle.component';
 
 @Component({
@@ -34,11 +36,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly platformId = inject(PLATFORM_ID);
   private readonly dataSources = inject(DataSourcesUiService);
+  private readonly donate = inject(DonateUiService);
   private feedTimer: ReturnType<typeof setInterval> | null = null;
   private readonly onVisibility = (): void => this.syncFeedTimer();
 
   readonly modes = SCAN_MODES;
   readonly mode = this.state.mode;
+  readonly discordUrl = DISCORD_INVITE_URL;
   readonly feedDefinitions = LIVE_FEED_DEFINITIONS;
   readonly feedIndex = signal(0);
   readonly activeFeed = computed(() => this.feedDefinitions[this.feedIndex()]);
@@ -79,6 +83,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   openDataSources(): void {
     this.dataSources.show();
+  }
+
+  openDonate(): void {
+    this.donate.show();
   }
 
   private syncFeedTimer(): void {

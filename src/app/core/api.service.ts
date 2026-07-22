@@ -209,15 +209,20 @@ export class ApiService {
    * Composes with severity + Patch filters (client-side on the hit list).
    */
   search(q: string): void {
-    const trimmed = q.trim();
+    const trimmed = q.trim().replace(/\s+/g, ' ');
     const cveLike = /^cve-?\d{0,4}-?\d*$/i.test(trimmed.replace(/\s+/g, ''));
-    if (!trimmed || (trimmed.length < 2 && !cveLike)) {
+
+    // Empty → back to catalog. Short non-CVE while typing → keep current results
+    // (do not clearSearch / reload catalog on a trailing space after 1 letter).
+    if (!trimmed) {
       this.clearSearch();
+      return;
+    }
+    if (trimmed.length < 2 && !cveLike) {
       return;
     }
 
     if (!this.state.isExample()) {
-      // Prefer full scan pool (before patch/severity slice) so filters still compose.
       const { cves, matchedBy, capped } = filterLocalMatches(
         this.state.cves(),
         trimmed,
@@ -226,6 +231,7 @@ export class ApiService {
       return;
     }
 
+    const requestQ = trimmed;
     this.state.loading.set(true);
     this.http
       .get<CatalogSearchResponse>(`${this.base}/api/customer/catalog/search`, {
@@ -244,6 +250,10 @@ export class ApiService {
         ),
         tap({
           next: (res) => {
+            // Ignore stale responses when the user kept typing (esp. with spaces).
+            if (this.state.searchInput().trim().replace(/\s+/g, ' ') !== requestQ) {
+              return;
+            }
             this.state.setSearchResults(
               res.q ?? trimmed,
               res.cves ?? [],
@@ -478,7 +488,7 @@ function filterLocalMatches(
   matchedBy: 'cve_id' | 'product' | 'description' | 'none';
   capped: boolean;
 } {
-  const trimmed = q.trim();
+  const trimmed = q.trim().replace(/\s+/g, ' ');
   if (looksLikeCveQuery(trimmed)) {
     const prefix = trimmed.toUpperCase().replace(/\s+/g, '').replace(/^CVE(?!-)/, 'CVE-');
     const normalized = prefix === 'CVE' ? 'CVE-' : prefix;
@@ -494,9 +504,8 @@ function filterLocalMatches(
     }
   }
 
-  const token = trimmed.toLowerCase();
   const byProduct = rows
-    .filter((r) => (r.product ?? '').toLowerCase().includes(token))
+    .filter((r) => productFieldMatches(r.product ?? '', trimmed))
     .slice(0, LOCAL_SEARCH_LIMIT);
   if (byProduct.length) {
     return {
@@ -506,11 +515,12 @@ function filterLocalMatches(
     };
   }
 
+  const phrase = trimmed.toLowerCase();
   const byDesc = rows
     .filter(
       (r) =>
-        (r.title ?? '').toLowerCase().includes(token) ||
-        (r.description ?? '').toLowerCase().includes(token),
+        (r.title ?? '').toLowerCase().includes(phrase) ||
+        (r.description ?? '').toLowerCase().includes(phrase),
     )
     .slice(0, LOCAL_SEARCH_LIMIT);
   return {
@@ -518,4 +528,21 @@ function filterLocalMatches(
     matchedBy: byDesc.length ? 'description' : 'none',
     capped: byDesc.length >= LOCAL_SEARCH_LIMIT,
   };
+}
+
+/** Match "google chrome" against product "chrome" / "google_chrome". */
+function productFieldMatches(product: string, q: string): boolean {
+  const p = product.toLowerCase();
+  if (!p) return false;
+  const phrase = q.toLowerCase().replace(/\s+/g, ' ').trim();
+  if (!phrase) return false;
+  if (p.includes(phrase)) return true;
+  if (p.includes(phrase.replace(/\s+/g, '_'))) return true;
+  const tokens = phrase.split(' ').filter((t) => t.length >= 2);
+  if (!tokens.length) return false;
+  // Multi-word: any meaningful token is enough (chrome in "google chrome").
+  if (tokens.length > 1) {
+    return tokens.some((t) => t.length >= 3 && p.includes(t));
+  }
+  return p.includes(tokens[0]!);
 }
