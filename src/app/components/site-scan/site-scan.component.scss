@@ -28,6 +28,10 @@
     padding: 0.7rem 0.85rem;
     font: inherit;
 
+    &::placeholder {
+      color: var(--cves-text-dim);
+    }
+
     &:focus {
       outline: none;
       border-color: var(--cves-green);
@@ -35,6 +39,23 @@
 
     &:disabled {
       opacity: 0.6;
+    }
+
+    &:-webkit-autofill,
+    &:-webkit-autofill:hover,
+    &:-webkit-autofill:focus {
+      -webkit-text-fill-color: var(--cves-text);
+      caret-color: var(--cves-text);
+      border-color: var(--cves-border);
+      box-shadow: 0 0 0 1000px var(--cves-surface2) inset;
+      transition: background-color 99999s ease-out 0s;
+    }
+
+    &:-webkit-autofill:focus {
+      border-color: var(--cves-green);
+      box-shadow:
+        0 0 0 1000px var(--cves-surface2) inset,
+        0 0 0 1px var(--cves-green);
     }
   }
 

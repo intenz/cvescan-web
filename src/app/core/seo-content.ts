@@ -8,8 +8,6 @@ export interface ScanModeInfo {
   label: string;
   h1: string;
   description: string;
-  /** Extra lines for the mode ? tooltip (what the user needs). */
-  tips: string[];
   available: boolean;
 }
 
@@ -20,11 +18,6 @@ export const SCAN_MODES: ScanModeInfo[] = [
     h1: 'Runtime CVE scanner for installed software',
     description:
       'Upload installed software. We map each product CPE → CVE and list known vulnerabilities.',
-    tips: [
-      'Pick your OS, copy the inventory command, run it on that device.',
-      'Upload scan_results.txt (app names + versions).',
-      'We match CPE → CVE against NVD. No client data stored.',
-    ],
     available: true,
   },
   {
@@ -33,11 +26,6 @@ export const SCAN_MODES: ScanModeInfo[] = [
     h1: 'Runtime CVE scanner for websites',
     description:
       'Enter a website URL. We probe public headers/HTML for stack signals and match related CVEs.',
-    tips: [
-      'Need: a public https:// URL (no login, no VPN-only sites).',
-      'We probe HTTP headers, HTML, DNS/TLS — not private pages.',
-      'No file upload. Best when the site exposes Server / stack signals.',
-    ],
     available: true,
   },
   {
@@ -46,11 +34,6 @@ export const SCAN_MODES: ScanModeInfo[] = [
     h1: 'Runtime CVE scanner for network services',
     description:
       'Run nmap service detection, upload the XML report, and match exposed services to CVEs.',
-    tips: [
-      'Need: nmap installed. Target goes at the end — LAN e.g. 192.168.0.0/24 or one host 192.168.0.10.',
-      'Only scan hosts you own or have permission to scan.',
-      'Upload scan_results.xml from -oX. Open services with product/version match best.',
-    ],
     available: true,
   },
 ];

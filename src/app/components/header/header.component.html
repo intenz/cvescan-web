@@ -7,39 +7,27 @@
   <div class="cves-header__modes">
     <nav class="cves-header__nav" aria-label="Scan mode">
       @for (m of modes; track m.id) {
-        <span class="cves-header__mode">
-          @if (m.available) {
-            <a
-              class="cves-header__nav-item"
-              [routerLink]="modeHref(m.id)"
-              routerLinkActive="is-active"
-              [routerLinkActiveOptions]="{ exact: m.id === 'local' }"
-            >
-              {{ m.label }}
-            </a>
-          } @else {
-            <button
-              type="button"
-              class="cves-header__nav-item is-soon"
-              disabled
-            >
-              {{ m.label }}
-              <span>soon</span>
-            </button>
-          }
-          <span
-            class="cves-header__mode-help"
-            [attr.aria-label]="m.label + ' help'"
+        @if (m.available) {
+          <a
+            class="cves-header__nav-item"
+            [routerLink]="modeHref(m.id)"
+            routerLinkActive="is-active"
+            [routerLinkActiveOptions]="{ exact: m.id === 'local' }"
+            [title]="m.description"
           >
-            <span class="cves-header__mode-help-mark" aria-hidden="true">?</span>
-            <span class="cves-header__mode-tip" role="tooltip">
-              <span class="cves-header__mode-tip-desc">{{ m.description }}</span>
-              @for (tip of m.tips; track tip) {
-                <span>{{ tip }}</span>
-              }
-            </span>
-          </span>
-        </span>
+            {{ m.label }}
+          </a>
+        } @else {
+          <button
+            type="button"
+            class="cves-header__nav-item is-soon"
+            disabled
+            [title]="m.description"
+          >
+            {{ m.label }}
+            <span>soon</span>
+          </button>
+        }
       }
     </nav>
   </div>

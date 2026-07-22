@@ -68,17 +68,50 @@ export class ScanPageComponent implements OnInit {
   readonly today = new Date().toISOString().slice(0, 10);
   readonly currentModeInfo = computed(() => modeInfo(this.state.mode()));
 
-  /** All modes: counts only (no app name list). */
+  /** Counts, then + extra (Browser URL/IP, Network important services, Local OS + apps). */
   readonly detectedLabel = computed(() => {
     const apps = this.state.detectedTotal() || this.state.detectedStack().length;
     const cves = this.state.cves().length;
+    const mode = this.state.mode();
     const unit =
-      this.state.mode() === 'network'
-        ? 'services'
-        : this.state.mode() === 'browser'
-          ? 'products'
-          : 'apps';
-    return `Checked ${apps} ${unit} · ${cves} CVEs`;
+      mode === 'network' ? 'services' : mode === 'browser' ? 'products' : 'apps';
+    const summary = `Checked ${apps} ${unit} · ${cves} CVEs`;
+
+    const extra: string[] = [];
+    if (mode === 'browser') {
+      const url = this.state.siteUrl()?.trim();
+      if (url) extra.push(url);
+      const ips = this.state.siteIps();
+      if (ips.length) {
+        extra.push(`IP ${ips[0]}${ips.length > 1 ? ` (+${ips.length - 1})` : ''}`);
+      }
+    } else if (mode === 'network') {
+      extra.push(...importantDetectedLabels(this.state.detectedStack(), 6));
+    } else if (mode === 'local') {
+      const os = this.state.os();
+      const osLabel =
+        os === 'macos'
+          ? 'macOS'
+          : os === 'windows'
+            ? 'Windows'
+            : os === 'linux'
+              ? 'Linux'
+              : os === 'iphone'
+                ? 'iPhone'
+                : os === 'android'
+                  ? 'Android'
+                  : os;
+      extra.push(osLabel);
+      const top = importantDetectedLabels(this.state.detectedStack(), 4);
+      if (top.length) extra.push(...top);
+      const shown = top.length;
+      const total = this.state.detectedTotal() || this.state.detectedStack().length;
+      if (total > shown && shown > 0) {
+        extra.push(`+${total - shown} more`);
+      }
+    }
+
+    return extra.length ? `${summary} + ${extra.join(' · ')}` : summary;
   });
 
   readonly showDetectedBanner = computed(
@@ -144,4 +177,48 @@ export class ScanPageComponent implements OnInit {
       this.api.loadCatalog(1);
     }
   }
+}
+
+/** Weak nmap/generic names — skip in banner unless they have a version. */
+const WEAK_DETECTED_NAMES = new Set([
+  'tcpwrapped',
+  'unknown',
+  'ppp',
+  'rtsp',
+  'http',
+  'https',
+  'ssl',
+  'tcp',
+  'udp',
+]);
+
+function importantDetectedLabels(
+  items: Array<{ name: string; version?: string; port?: string }>,
+  limit: number,
+): string[] {
+  const scored = items
+    .filter((p) => {
+      const key = p.name.trim().toLowerCase();
+      if (!key) return false;
+      if (p.version?.trim()) return true;
+      return !WEAK_DETECTED_NAMES.has(key);
+    })
+    .sort((a, b) => {
+      const av = a.version?.trim() ? 1 : 0;
+      const bv = b.version?.trim() ? 1 : 0;
+      return bv - av;
+    });
+
+  const out: string[] = [];
+  const seen = new Set<string>();
+  for (const p of scored) {
+    const base = p.version?.trim() ? `${p.name} ${p.version}` : p.name;
+    const label = p.port ? `${base} (:${p.port})` : base;
+    const dedupe = `${p.name.toLowerCase()}|${p.version ?? ''}`;
+    if (seen.has(dedupe)) continue;
+    seen.add(dedupe);
+    out.push(label);
+    if (out.length >= limit) break;
+  }
+  return out;
 }

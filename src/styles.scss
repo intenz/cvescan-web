@@ -32,6 +32,31 @@ input {
   font: inherit;
 }
 
+/* Keep Chrome/Safari autofill on-theme (no yellow/blue wash). */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--cves-text) !important;
+  caret-color: var(--cves-text);
+  border-color: var(--cves-border) !important;
+  box-shadow: 0 0 0 1000px var(--cves-surface2) inset !important;
+  transition: background-color 99999s ease-out 0s;
+}
+
+input:autofill,
+textarea:autofill,
+select:autofill {
+  background-color: var(--cves-surface2);
+  color: var(--cves-text);
+}
+
 ::-webkit-scrollbar {
   width: 4px;
   height: 4px;
