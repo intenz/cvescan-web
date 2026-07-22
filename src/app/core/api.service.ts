@@ -138,9 +138,12 @@ export class ApiService {
           error: (err) => {
             this.state.loading.set(false);
             this.state.error.set(
-              err?.error?.error?.message ??
-                err?.error?.message ??
-                'Site scan failed',
+              this.scanLimitOr(
+                err,
+                err?.error?.error?.message ??
+                  err?.error?.message ??
+                  'Site scan failed',
+              ),
             );
           },
         }),
@@ -357,10 +360,61 @@ export class ApiService {
           },
           error: (err) => {
             this.state.loading.set(false);
-            this.state.error.set(err?.error?.error?.message ?? 'Scan failed');
+            this.state.error.set(
+              this.scanLimitOr(err, err?.error?.error?.message ?? 'Scan failed'),
+            );
           },
         }),
       );
+  }
+
+  /** Customer CSV report from already-matched scan results (not External API). */
+  downloadScanReport(cves: CveItem[]): Observable<void> {
+    const payload = {
+      cves: cves.map((c) => ({
+        cve_id: c.cve_id,
+        title: c.title,
+        severity: c.severity,
+        cvss: c.cvss,
+        product: c.product,
+        version: c.version,
+        published: c.published,
+        kev: c.kev,
+        patch_available: c.patch_available,
+      })),
+    };
+    return this.http
+      .post(`${this.base}/api/customer/report/csv`, payload, {
+        headers: this.headers(),
+        responseType: 'blob',
+      })
+      .pipe(
+        tap((blob) => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'cvescan-report.csv';
+          a.click();
+          URL.revokeObjectURL(url);
+        }),
+        map(() => undefined),
+        catchError((err) => {
+          const msg = this.scanLimitOr(
+            err,
+            'Could not download scan report — try again',
+          );
+          this.state.error.set(msg);
+          throw err;
+        }),
+      );
+  }
+
+  /** Shared copy when customer scan endpoints return HTTP 429. */
+  private scanLimitOr(err: { status?: number } | null | undefined, fallback: string): string {
+    if (err?.status === 429) {
+      return 'Too many scans — try again in a minute';
+    }
+    return fallback;
   }
 
   private fallbackCommand(mode: ScanMode, os: ScanOs): string {

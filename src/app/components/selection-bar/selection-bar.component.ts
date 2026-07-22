@@ -36,6 +36,10 @@ export class SelectionBarComponent {
     this.remUi.show(this.state.selectedCves());
   }
 
+  cancel(): void {
+    this.state.clearSelection();
+  }
+
   exportCsv(): void {
     const rows = this.state.selectedCves();
     if (!rows.length) return;

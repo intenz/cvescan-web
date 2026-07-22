@@ -27,6 +27,11 @@ export class UploadZoneComponent implements OnDestroy {
   readonly label = computed(() =>
     this.isNetwork() ? 'Upload scan_results.xml' : 'Upload scan_results.txt',
   );
+  /** Real upload only — not the catalog preview / example rows. */
+  readonly canDownload = computed(
+    () => this.state.uploaded() && !this.state.isExample() && this.state.cves().length > 0,
+  );
+  readonly downloadBusy = signal(false);
 
   private stageTimer: ReturnType<typeof setInterval> | null = null;
 
@@ -51,6 +56,19 @@ export class UploadZoneComponent implements OnDestroy {
       complete: () => this.stopStages(),
     });
     input.value = '';
+  }
+
+  downloadReport(): void {
+    const rows = this.state.cves();
+    if (!rows.length || this.downloadBusy()) return;
+    this.downloadBusy.set(true);
+    this.api.downloadScanReport(rows).subscribe({
+      next: () => this.downloadBusy.set(false),
+      error: () => {
+        this.downloadBusy.set(false);
+        // ApiService already sets a clear message (incl. 429 rate limit).
+      },
+    });
   }
 
   ngOnDestroy(): void {

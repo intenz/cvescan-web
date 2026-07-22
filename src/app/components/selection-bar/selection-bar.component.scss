@@ -41,6 +41,11 @@
       &:active:not(:disabled) {
         transform: scale(0.97);
       }
+
+      &.cves-selection__cancel:hover:not(:disabled) {
+        border-color: var(--cves-text-muted);
+        color: var(--cves-text-muted);
+      }
     }
   }
 }

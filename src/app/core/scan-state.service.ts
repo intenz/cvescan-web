@@ -72,6 +72,12 @@ export class ScanStateService {
   /** Tracked/patch list hard-capped at 100 (catalog API or scan client). */
   readonly patchCapped = signal(false);
 
+  constructor() {
+    // Restore before AppComponent's loadCommand effect so a refreshed Browser
+    // session does not briefly fetch / show Local Programs commands.
+    this.restorePrefs();
+  }
+
   readonly searchActive = computed(() => {
     const q = this.searchQuery().trim();
     if (!q) return false;
@@ -171,6 +177,11 @@ export class ScanStateService {
       if (data.mode && MODES.includes(data.mode) && modeInfo(data.mode).available) {
         this.mode.set(data.mode);
         restored.mode = true;
+        if (data.mode === 'browser') {
+          // Browser mode uses URL probe UI — never keep a Local Programs command.
+          this.command.set('');
+          this.hint.set('Enter a website URL to probe public stack signals');
+        }
       }
       if (data.os && OSES.includes(data.os)) {
         this.os.set(normalizeOsForMode(this.mode(), data.os));
@@ -192,6 +203,8 @@ export class ScanStateService {
       this.siteUrl.set('');
       this.detectedStack.set([]);
       this.uploaded.set(false);
+      this.command.set('');
+      this.hint.set('Enter a website URL to probe public stack signals');
     }
     this.persistPrefs();
   }

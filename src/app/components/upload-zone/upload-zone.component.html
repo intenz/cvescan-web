@@ -18,20 +18,32 @@
         <span>{{ label() }}</span>
       }
     </label>
-    <p class="cves-upload__format">
-      @if (isNetwork()) {
-        <strong>Format:</strong> nmap XML (<code>.xml</code> from <code>-oX</code>).
-        @if (skipStepsHint()) {
-          Already have <code>scan_results.xml</code>? Upload it here — no need to expand the steps.
+    @if (canDownload()) {
+      <button
+        type="button"
+        class="cves-upload__download"
+        title="Download CSV report with all matched CVEs"
+        [disabled]="downloadBusy()"
+        (click)="downloadReport()"
+      >
+        {{ downloadBusy() ? 'Preparing…' : 'Download scan report' }}
+      </button>
+    } @else {
+      <p class="cves-upload__format">
+        @if (isNetwork()) {
+          <strong>Format:</strong> nmap XML (<code>.xml</code> from <code>-oX</code>).
+          @if (skipStepsHint()) {
+            Already have <code>scan_results.xml</code>? Upload it here — no need to expand the steps.
+          }
+        } @else {
+          <strong>Format:</strong> plain-text inventory (<code>.txt</code>) — package/app names with
+          versions.
+          @if (skipStepsHint()) {
+            Already have <code>scan_results.txt</code>? Upload it here — no need to expand the steps.
+          }
         }
-      } @else {
-        <strong>Format:</strong> plain-text inventory (<code>.txt</code>) — package/app names with
-        versions.
-        @if (skipStepsHint()) {
-          Already have <code>scan_results.txt</code>? Upload it here — no need to expand the steps.
-        }
-      }
-    </p>
+      </p>
+    }
   </div>
   <p class="cves-upload__hint">
     No client data stored. Matched against NVD — your file is not retained after the scan.
