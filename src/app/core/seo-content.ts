@@ -74,7 +74,7 @@ export const HOME_SEO = {
   description:
     'Free runtime CVE scanner: upload installed software, nmap XML, or check a public site. Match product → CPE → CVE against NVD. macOS, Linux, Windows — no account, no client data stored.',
   canonical: `${SITE_URL}/`,
-  ogImage: `${SITE_URL}/og-image.png`,
+  ogImage: `${SITE_URL}/og-image.png?v=20260722`,
   h1: 'Runtime CVE scanner for installed software',
   /** Short line under the page H1 (above the scan strip). */
   tagline:

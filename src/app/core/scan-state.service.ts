@@ -76,6 +76,8 @@ export class ScanStateService {
   readonly searchCapped = signal(false);
   /** Tracked/patch CVE list hard-capped at 100 (catalog API or scan client). */
   readonly patchCapped = signal(false);
+  /** Severity browse list hard-capped at 500. */
+  readonly catalogCapped = signal(false);
   /** Latest support crawl (`supported_targets.synced_at`) for Patch tooltip. */
   readonly supportSyncedAt = signal<string | null>(null);
 
@@ -299,7 +301,13 @@ export class ScanStateService {
     this.catalogTotal.set(total);
     this.isExample.set(true);
     this.uploaded.set(false);
-    this.patchCapped.set(capped);
+    if (this.patchOnlyFilter()) {
+      this.patchCapped.set(capped);
+      this.catalogCapped.set(false);
+    } else {
+      this.patchCapped.set(false);
+      this.catalogCapped.set(capped);
+    }
     this.page.set(page);
     this.closeSidebar();
   }
@@ -325,6 +333,7 @@ export class ScanStateService {
     this.severityFilter.set('ALL');
     this.patchOnlyFilter.set(false);
     this.patchCapped.set(false);
+    this.catalogCapped.set(false);
     this.page.set(1);
   }
 

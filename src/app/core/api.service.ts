@@ -215,7 +215,11 @@ export class ApiService {
 
   setSeverity(filter: Severity | 'ALL'): void {
     this.state.setSeverityFilter(filter);
-    if (this.state.searchActive()) return;
+    if (this.state.searchActive()) {
+      // Re-run search so severity is applied server-side (before the hit cap).
+      this.search(this.state.searchQuery());
+      return;
+    }
     if (this.state.isExample()) {
       this.loadCatalog(1, filter);
     }
@@ -252,7 +256,10 @@ export class ApiService {
     this.state.loading.set(true);
     this.http
       .get<CatalogSearchResponse>(`${this.base}/api/customer/catalog/search`, {
-        params: { q: trimmed },
+        params: {
+          q: trimmed,
+          severity: this.state.severityFilter(),
+        },
         headers: this.headers(),
       })
       .pipe(
