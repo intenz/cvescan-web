@@ -38,6 +38,7 @@ export class ScanStateService {
   readonly siteEntered = signal(false);
   readonly siteUrl = signal('');
   readonly detectedStack = signal<Array<{ name: string; version?: string }>>([]);
+  readonly siteIps = signal<string[]>([]);
   readonly cves = signal<CveItem[]>(EXAMPLE_CVES);
   readonly isExample = signal(true);
   /** Total rows in catalog (server-side). For scan results = filtered length. */
@@ -73,8 +74,13 @@ export class ScanStateService {
   readonly patchCapped = signal(false);
 
   constructor() {
-    // Restore before AppComponent's loadCommand effect so a refreshed Browser
-    // session does not briefly fetch / show Local Programs commands.
+    if (isPlatformBrowser(this.platformId)) {
+      const path = window.location.pathname.replace(/\/$/, '') || '/';
+      if (path === '/browser') this.mode.set('browser');
+      else if (path === '/network') this.mode.set('network');
+      else this.mode.set('local');
+    }
+    // OS only — scan mode is owned by the URL after boot.
     this.restorePrefs();
   }
 
@@ -166,25 +172,20 @@ export class ScanStateService {
     return 4;
   });
 
-  /** Restore last active mode/OS from localStorage. Returns what was restored. */
-  restorePrefs(): { mode: boolean; os: boolean } {
-    const restored = { mode: false, os: false };
+  /** Restore last OS (and mode for initial redirect). Mode is owned by the URL after boot. */
+  restorePrefs(): { mode: boolean; os: boolean; modeValue: ScanMode | null } {
+    const restored = { mode: false, os: false, modeValue: null as ScanMode | null };
     if (!isPlatformBrowser(this.platformId)) return restored;
     try {
       const raw = localStorage.getItem(PREFS_KEY);
       if (!raw) return restored;
       const data = JSON.parse(raw) as ScanPrefs;
       if (data.mode && MODES.includes(data.mode) && modeInfo(data.mode).available) {
-        this.mode.set(data.mode);
         restored.mode = true;
-        if (data.mode === 'browser') {
-          // Browser mode uses URL probe UI — never keep a Local Programs command.
-          this.command.set('');
-          this.hint.set('Enter a website URL to probe public stack signals');
-        }
+        restored.modeValue = data.mode;
       }
       if (data.os && OSES.includes(data.os)) {
-        this.os.set(normalizeOsForMode(this.mode(), data.os));
+        this.os.set(data.os);
         restored.os = true;
       }
     } catch {
@@ -193,20 +194,38 @@ export class ScanStateService {
     return restored;
   }
 
-  setMode(mode: ScanMode): void {
+  /** Apply scan mode from the URL. Clears prior results when the mode changes. */
+  enterScanMode(mode: ScanMode): boolean {
+    const changed = this.mode() !== mode;
     this.mode.set(mode);
     this.error.set(null);
     this.commandCopied.set(false);
     this.os.set(normalizeOsForMode(mode, this.os()));
     if (mode === 'browser') {
-      this.siteEntered.set(false);
-      this.siteUrl.set('');
-      this.detectedStack.set([]);
-      this.uploaded.set(false);
       this.command.set('');
       this.hint.set('Enter a website URL to probe public stack signals');
     }
+    if (changed) {
+      this.clearScanSession();
+    }
     this.persistPrefs();
+    return changed;
+  }
+
+  /** Drop live scan results / download affordance — back to catalog preview. */
+  clearScanSession(): void {
+    this.siteEntered.set(false);
+    this.siteUrl.set('');
+    this.detectedStack.set([]);
+    this.siteIps.set([]);
+    this.uploaded.set(false);
+    this.stripCollapsed.set(false);
+    this.resetListFilters();
+    this.clearSelection();
+    this.closeSidebar();
+    this.isExample.set(true);
+    this.cves.set(EXAMPLE_CVES);
+    this.catalogTotal.set(0);
   }
 
   markSiteEntered(): void {
@@ -217,9 +236,11 @@ export class ScanStateService {
     cves: CveItem[],
     url: string,
     detected: Array<{ name: string; version?: string }>,
+    ips: string[] = [],
   ): void {
     this.siteUrl.set(url);
     this.detectedStack.set(detected);
+    this.siteIps.set(ips);
     this.setResults(cves, false);
   }
 

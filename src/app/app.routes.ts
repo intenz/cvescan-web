@@ -1,8 +1,23 @@
 import { Routes } from '@angular/router';
 import { ScanPageComponent } from './pages/scan-page/scan-page.component';
+import type { ScanMode } from './core/models';
 
 export const routes: Routes = [
-  { path: '', component: ScanPageComponent },
+  {
+    path: '',
+    component: ScanPageComponent,
+    data: { mode: 'local' satisfies ScanMode },
+  },
+  {
+    path: 'browser',
+    component: ScanPageComponent,
+    data: { mode: 'browser' satisfies ScanMode },
+  },
+  {
+    path: 'network',
+    component: ScanPageComponent,
+    data: { mode: 'network' satisfies ScanMode },
+  },
   {
     path: 'external-api',
     loadComponent: () =>

@@ -1,9 +1,11 @@
-<section class="cves-site">
+<section class="cves-site" [class.is-compact]="compact()">
   <form class="cves-site__form" (submit)="$event.preventDefault(); submit()">
-    <label class="cves-site__label" for="cves-site-url">Website</label>
+    @if (!compact()) {
+      <label class="cves-site__label" [attr.for]="inputId()">Website</label>
+    }
     <div class="cves-site__row">
       <input
-        id="cves-site-url"
+        [id]="inputId()"
         type="url"
         name="url"
         placeholder="https://example.com"
@@ -11,14 +13,22 @@
         [ngModel]="url()"
         (ngModelChange)="url.set($event)"
         [disabled]="busy()"
+        [attr.aria-label]="compact() ? 'Website URL' : null"
       />
       <button type="submit" [disabled]="busy() || !url().trim()">
         {{ busy() ? 'Scanning…' : 'Scan site' }}
       </button>
+      @if (canDownload()) {
+        <cves-download-report />
+      }
     </div>
   </form>
   <p class="cves-site__hint">
-    We probe public HTTP headers and HTML signals (Server, X-Powered-By, generator) — no login, no crawl of private pages.
+    @if (compact()) {
+      Probe another public URL here — no need to expand the steps.
+    } @else {
+      We probe public HTTP headers, HTML signals, DNS/TLS (and Shodan if configured) — no login, no crawl of private pages.
+    }
   </p>
   @if (state.error(); as err) {
     <p class="cves-site__error">{{ err }}</p>

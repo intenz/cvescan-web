@@ -11,12 +11,15 @@
 
   &__row {
     display: flex;
+    flex-wrap: wrap;
     gap: 0.55rem;
     align-items: stretch;
   }
 
   input {
-    flex: 1;
+    flex: 1 1 12rem;
+    width: 100%;
+    max-width: 26rem;
     min-width: 0;
     background: var(--cves-surface2);
     border: 1px solid var(--cves-border);
@@ -35,7 +38,7 @@
     }
   }
 
-  button {
+  button[type='submit'] {
     flex-shrink: 0;
     background: var(--cves-green);
     border: 1px solid var(--cves-green);
@@ -62,6 +65,17 @@
     margin: 0;
     color: var(--cves-amber);
     font-size: 0.75rem;
+  }
+
+  &.is-compact {
+    .cves-site__hint {
+      margin-top: 0.15rem;
+      max-width: 36rem;
+    }
+
+    input {
+      max-width: 22rem;
+    }
   }
 }
 

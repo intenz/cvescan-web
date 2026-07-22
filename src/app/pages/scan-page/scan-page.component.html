@@ -6,8 +6,12 @@
 
   <div class="cves-scan__strip" [class.is-collapsed]="state.stripCollapsed()">
     <div class="cves-scan__strip-head">
-      @if (state.stripCollapsed() && state.mode() !== 'browser') {
-        <cves-upload-zone [skipStepsHint]="true" />
+      @if (state.stripCollapsed()) {
+        @if (state.mode() === 'browser') {
+          <cves-site-scan [compact]="true" />
+        } @else {
+          <cves-upload-zone [skipStepsHint]="true" />
+        }
       } @else {
         <cves-scan-wizard />
       }
@@ -46,7 +50,10 @@
         ◈ Catalog preview in our DB ({{ state.totalCount() }} CVEs) — upload scan_results.txt to see matches for your system
       }
     </div>
-  } @else if (state.mode() === 'browser' && state.detectedStack().length) {
+  } @else if (
+    state.mode() === 'browser' &&
+    (state.detectedStack().length || state.siteIps().length)
+  ) {
     <div class="cves-scan__banner">
       Detected: {{ detectedLabel() }}
       @if (state.siteUrl()) {

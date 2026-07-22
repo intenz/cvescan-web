@@ -19,15 +19,7 @@
       }
     </label>
     @if (canDownload()) {
-      <button
-        type="button"
-        class="cves-upload__download"
-        title="Download CSV report with all matched CVEs"
-        [disabled]="downloadBusy()"
-        (click)="downloadReport()"
-      >
-        {{ downloadBusy() ? 'Preparing…' : 'Download scan report' }}
-      </button>
+      <cves-download-report />
     } @else {
       <p class="cves-upload__format">
         @if (isNetwork()) {

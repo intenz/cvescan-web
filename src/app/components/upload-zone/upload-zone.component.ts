@@ -2,10 +2,12 @@ import { Component, OnDestroy, computed, inject, input, signal } from '@angular/
 import { ApiService } from '../../core/api.service';
 import { ScanStateService } from '../../core/scan-state.service';
 import { UPLOAD_STAGES } from '../../core/ui-motion';
+import { DownloadReportComponent } from '../download-report/download-report.component';
 
 @Component({
   selector: 'cves-upload-zone',
   standalone: true,
+  imports: [DownloadReportComponent],
   templateUrl: './upload-zone.component.html',
   styleUrl: './upload-zone.component.scss',
 })
@@ -31,7 +33,6 @@ export class UploadZoneComponent implements OnDestroy {
   readonly canDownload = computed(
     () => this.state.uploaded() && !this.state.isExample() && this.state.cves().length > 0,
   );
-  readonly downloadBusy = signal(false);
 
   private stageTimer: ReturnType<typeof setInterval> | null = null;
 
@@ -56,19 +57,6 @@ export class UploadZoneComponent implements OnDestroy {
       complete: () => this.stopStages(),
     });
     input.value = '';
-  }
-
-  downloadReport(): void {
-    const rows = this.state.cves();
-    if (!rows.length || this.downloadBusy()) return;
-    this.downloadBusy.set(true);
-    this.api.downloadScanReport(rows).subscribe({
-      next: () => this.downloadBusy.set(false),
-      error: () => {
-        this.downloadBusy.set(false);
-        // ApiService already sets a clear message (incl. 429 rate limit).
-      },
-    });
   }
 
   ngOnDestroy(): void {

@@ -1,5 +1,15 @@
-import { Component, OnInit, PLATFORM_ID, computed, inject } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  OnInit,
+  PLATFORM_ID,
+  computed,
+  inject,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { isPlatformBrowser } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router';
+import { distinctUntilChanged, map } from 'rxjs/operators';
 import { ScanWizardComponent } from '../../components/scan-wizard/scan-wizard.component';
 import { OsTabsComponent } from '../../components/os-tabs/os-tabs.component';
 import { CommandPanelComponent } from '../../components/command-panel/command-panel.component';
@@ -15,13 +25,16 @@ import {
   isScanOsAvailable,
 } from '../../core/detect-browser-os';
 import { normalizeOsForMode } from '../../core/normalize-os';
+import type { ScanMode } from '../../core/models';
 import { ScanStateService } from '../../core/scan-state.service';
 import { ApiService } from '../../core/api.service';
 import { SeoService, applyPageSeo } from '../../core/seo.service';
+import { modePath } from '../../core/mode-path';
 import {
   HOME_SEO,
   howToJsonLd,
   modeInfo,
+  modeSeo,
   softwareApplicationJsonLd,
 } from '../../core/seo-content';
 
@@ -46,37 +59,73 @@ import {
 export class ScanPageComponent implements OnInit {
   private readonly api = inject(ApiService);
   private readonly seo = inject(SeoService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly platformId = inject(PLATFORM_ID);
   readonly state = inject(ScanStateService);
   readonly home = HOME_SEO;
   readonly today = new Date().toISOString().slice(0, 10);
   readonly currentModeInfo = computed(() => modeInfo(this.state.mode()));
-  readonly detectedLabel = computed(() =>
-    this.state
+  readonly detectedLabel = computed(() => {
+    const parts = this.state
       .detectedStack()
-      .map((p) => (p.version ? `${p.name} ${p.version}` : p.name))
-      .join(' · '),
-  );
+      .map((p) => (p.version ? `${p.name} ${p.version}` : p.name));
+    const ips = this.state.siteIps();
+    if (ips.length) {
+      parts.push(`IP ${ips[0]}${ips.length > 1 ? ` (+${ips.length - 1})` : ''}`);
+    }
+    return parts.join(' · ');
+  });
 
   ngOnInit(): void {
-    applyPageSeo(this.seo, HOME_SEO, [
-      softwareApplicationJsonLd(),
-      howToJsonLd(),
-    ]);
-    if (!isPlatformBrowser(this.platformId)) return;
+    if (!isPlatformBrowser(this.platformId)) {
+      const mode = (this.route.snapshot.data['mode'] as ScanMode) ?? 'local';
+      this.applyMode(mode, false);
+      return;
+    }
 
     const restored = this.state.restorePrefs();
     const detectedOs = detectBrowserOs();
     const fallbackOs = isScanOsAvailable(detectedOs) ? detectedOs : 'macos';
     if (!restored.os) {
-      // Preselect OS for tabs/command, but do not mark wizard step 1 done
-      // until the user explicitly confirms by clicking an OS tab.
       this.state.os.set(fallbackOs);
     } else {
       this.state.os.set(normalizeOsForMode(this.state.mode(), this.state.os()));
     }
 
-    this.api.loadCatalog();
+    this.route.data
+      .pipe(
+        map((d) => (d['mode'] as ScanMode) ?? 'local'),
+        distinctUntilChanged(),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((mode) => this.applyMode(mode, true));
+
+    // One-time: open last mode when landing on `/` (URL becomes source of truth after).
+    const routeMode = (this.route.snapshot.data['mode'] as ScanMode) ?? 'local';
+    if (
+      routeMode === 'local' &&
+      restored.modeValue &&
+      restored.modeValue !== 'local' &&
+      !sessionStorage.getItem('cves-mode-redirected')
+    ) {
+      sessionStorage.setItem('cves-mode-redirected', '1');
+      void this.router.navigateByUrl(modePath(restored.modeValue));
+    }
+
     this.api.loadFeedStatus();
+  }
+
+  private applyMode(mode: ScanMode, loadCatalog: boolean): void {
+    const changed = this.state.enterScanMode(mode);
+    this.state.os.set(normalizeOsForMode(mode, this.state.os()));
+    applyPageSeo(this.seo, modeSeo(mode), [
+      softwareApplicationJsonLd(),
+      howToJsonLd(),
+    ]);
+    if (loadCatalog && (changed || this.state.isExample())) {
+      this.api.loadCatalog(1);
+    }
   }
 }

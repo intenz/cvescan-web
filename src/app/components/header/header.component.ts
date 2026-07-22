@@ -8,14 +8,15 @@ import {
   signal,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 import type { ScanMode } from '../../core/models';
 import {
   LIVE_FEED_DEFINITIONS,
   formatFeedUpdatedAt,
   liveFeedTooltip,
 } from '../../core/live-feeds';
-import { SCAN_MODES, modeInfo } from '../../core/seo-content';
+import { SCAN_MODES } from '../../core/seo-content';
+import { modePath } from '../../core/mode-path';
 import { ScanStateService } from '../../core/scan-state.service';
 import { ApiService } from '../../core/api.service';
 import { DataSourcesUiService } from '../../core/data-sources-ui.service';
@@ -33,7 +34,6 @@ import { ThemeToggleComponent } from '../theme-toggle/theme-toggle.component';
 export class HeaderComponent implements OnInit, OnDestroy {
   private readonly state = inject(ScanStateService);
   private readonly api = inject(ApiService);
-  private readonly router = inject(Router);
   private readonly platformId = inject(PLATFORM_ID);
   private readonly dataSources = inject(DataSourcesUiService);
   private readonly donate = inject(DonateUiService);
@@ -41,7 +41,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
   private readonly onVisibility = (): void => this.syncFeedTimer();
 
   readonly modes = SCAN_MODES;
-  readonly mode = this.state.mode;
   readonly discordUrl = DISCORD_INVITE_URL;
   readonly feedDefinitions = LIVE_FEED_DEFINITIONS;
   readonly feedIndex = signal(0);
@@ -60,6 +59,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
   readonly liveSlotCh =
     Math.max(...LIVE_FEED_DEFINITIONS.map((f) => f.label.length)) + 2;
 
+  modeHref(mode: ScanMode): string {
+    return modePath(mode);
+  }
+
   ngOnInit(): void {
     if (!isPlatformBrowser(this.platformId)) return;
     this.api.loadFeedStatus();
@@ -71,14 +74,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
     if (!isPlatformBrowser(this.platformId)) return;
     document.removeEventListener('visibilitychange', this.onVisibility);
     this.stopFeedTimer();
-  }
-
-  setMode(mode: ScanMode): void {
-    const info = modeInfo(mode);
-    if (!info.available) return;
-    this.state.setMode(mode);
-    // Mode UI lives on the scan page — leave FAQ / External API when switching.
-    void this.router.navigateByUrl('/');
   }
 
   openDataSources(): void {

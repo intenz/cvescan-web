@@ -42,6 +42,33 @@ export function modeInfo(mode: ScanMode): ScanModeInfo {
   return SCAN_MODES.find((m) => m.id === mode) ?? SCAN_MODES[0];
 }
 
+export function modeSeo(mode: ScanMode): {
+  title: string;
+  description: string;
+  canonical: string;
+} {
+  const info = modeInfo(mode);
+  if (mode === 'local') {
+    return {
+      title: HOME_SEO.title,
+      description: HOME_SEO.description,
+      canonical: HOME_SEO.canonical,
+    };
+  }
+  if (mode === 'browser') {
+    return {
+      title: 'CVEScan Browser — Website stack CVE scanner | cvescan.app',
+      description: info.description,
+      canonical: `${SITE_URL}/browser`,
+    };
+  }
+  return {
+    title: 'CVEScan Network — nmap service CVE scanner | cvescan.app',
+    description: info.description,
+    canonical: `${SITE_URL}/network`,
+  };
+}
+
 export const HOME_SEO = {
   title: 'CVEScan — Runtime CVE Scanner | CPE → CVE for Installed Software',
   description:

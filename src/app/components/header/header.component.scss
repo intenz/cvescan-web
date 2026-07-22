@@ -49,6 +49,8 @@
     cursor: pointer;
     padding: 0.25rem 0;
     border-bottom: 2px solid transparent;
+    font: inherit;
+    text-decoration: none;
 
     &.is-active {
       color: var(--cves-text);

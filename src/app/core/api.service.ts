@@ -20,6 +20,7 @@ interface SiteScanResponse {
   url?: string;
   finalUrl?: string;
   detected?: Array<{ name: string; version?: string }>;
+  ips?: string[];
   meta?: { message?: string };
   error?: { message?: string };
 }
@@ -132,6 +133,7 @@ export class ApiService {
               res.cves ?? [],
               res.finalUrl ?? res.url ?? url,
               res.detected ?? [],
+              res.ips ?? [],
             );
             this.state.loading.set(false);
           },

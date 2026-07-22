@@ -43,11 +43,12 @@
     align-items: flex-start;
     justify-content: flex-start;
     gap: 1rem;
-    /* Reserve room so content never sits under the pinned Expand/Collapse control */
-    padding-right: 7.25rem;
+    /* Extra room so Scan / Download never crowd the pinned Collapse control */
+    padding-right: 8.5rem;
     min-height: 2rem;
 
     > cves-upload-zone,
+    > cves-site-scan,
     > cves-scan-wizard {
       flex: 1;
       min-width: 0;

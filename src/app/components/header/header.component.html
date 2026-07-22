@@ -7,20 +7,27 @@
   <div class="cves-header__modes">
     <nav class="cves-header__nav" aria-label="Scan mode">
       @for (m of modes; track m.id) {
-        <button
-          type="button"
-          class="cves-header__nav-item"
-          [class.is-active]="mode() === m.id"
-          [class.is-soon]="!m.available"
-          [disabled]="!m.available"
-          [title]="m.description"
-          (click)="setMode(m.id)"
-        >
-          {{ m.label }}
-          @if (!m.available) {
+        @if (m.available) {
+          <a
+            class="cves-header__nav-item"
+            [routerLink]="modeHref(m.id)"
+            routerLinkActive="is-active"
+            [routerLinkActiveOptions]="{ exact: m.id === 'local' }"
+            [title]="m.description"
+          >
+            {{ m.label }}
+          </a>
+        } @else {
+          <button
+            type="button"
+            class="cves-header__nav-item is-soon"
+            disabled
+            [title]="m.description"
+          >
+            {{ m.label }}
             <span>soon</span>
-          }
-        </button>
+          </button>
+        }
       }
     </nav>
   </div>
