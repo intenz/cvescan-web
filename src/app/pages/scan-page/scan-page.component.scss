@@ -280,6 +280,18 @@
     color: var(--cves-text-dim);
     font-size: 0.75rem;
   }
+
+  &__all-noise {
+    margin: 0.75rem 0 0;
+    padding: 0.65rem 0.85rem;
+    border-radius: 4px;
+    border: 1px solid color-mix(in srgb, var(--cves-green) 40%, transparent);
+    background: color-mix(in srgb, var(--cves-green) 10%, transparent);
+    color: var(--cves-green);
+    font-size: 0.82rem;
+    line-height: 1.4;
+    animation: cves-fade-up 0.35s ease;
+  }
 }
 
 @keyframes cves-fade-up {

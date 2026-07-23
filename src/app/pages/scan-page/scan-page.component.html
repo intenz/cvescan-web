@@ -107,6 +107,12 @@
       <p class="cves-scan__meta">
         NVD data · {{ today }} · No client data stored
       </p>
+      @if (allNoiseResults()) {
+        <div class="cves-scan__all-noise" role="status">
+          ◈ Looks like you’re in good shape — every match is Noise (no known
+          affected version). Nothing here is confirmed for your stack.
+        </div>
+      }
     </div>
     <cves-cve-sidebar />
   </div>

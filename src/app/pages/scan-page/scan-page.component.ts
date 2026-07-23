@@ -88,6 +88,12 @@ export class ScanPageComponent implements OnInit {
       this.state.cves().filter((c) => !hasConcreteCveVersion(c.version)).length,
   );
 
+  /** Every matched CVE is unversioned Noise — no precise version hit. */
+  readonly allNoiseResults = computed(() => {
+    const n = this.state.cves().length;
+    return n > 0 && this.unversionedCveCount() === n;
+  });
+
   /** Compact extras only (URL / IP) — no app name dump. */
   readonly detectedExtra = computed(() => {
     if (this.state.mode() !== 'browser') return '';
