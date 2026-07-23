@@ -9,6 +9,8 @@ export interface RemediationPayload {
   userVersion: string | null;
   latestVersion: string | null;
   patchAvailable: boolean | null;
+  /** Non-copyable macOS GUI hint (shown above brew command). */
+  macosHint?: string | null;
   commands: {
     macos: string | null;
     linux: string | null;
@@ -84,7 +86,12 @@ export function uniqueRemediations(cves: CveItem[]): RemediationPayload[] {
 }
 
 export function hasRemediationCommands(r: RemediationPayload): boolean {
-  return Boolean(r.commands.macos || r.commands.linux || r.commands.windows);
+  return Boolean(
+    r.macosHint ||
+      r.commands.macos ||
+      r.commands.linux ||
+      r.commands.windows,
+  );
 }
 
 /** Show Remediation only when an update is available (not “up to date”). */

@@ -68,15 +68,20 @@ function mergeOs(
 
   for (const raw of cmds) {
     if (!raw?.trim()) continue;
-    const parsed = parseMergeableCommand(raw);
-    if (!parsed) {
-      leftovers.push(raw.trim());
-      continue;
+    // Per-product blocks may include brew + /Applications hint — merge line by line.
+    for (const line of raw.split(/\n+/)) {
+      const trimmed = line.trim();
+      if (!trimmed) continue;
+      const parsed = parseMergeableCommand(trimmed);
+      if (!parsed) {
+        leftovers.push(trimmed);
+        continue;
+      }
+      if (parsed.kind === 'brew-cask') casks.push(...parsed.packages);
+      else if (parsed.kind === 'brew-formula') formulas.push(...parsed.packages);
+      else if (parsed.kind === 'apt') apt.push(...parsed.packages);
+      else winget.push(...parsed.packages);
     }
-    if (parsed.kind === 'brew-cask') casks.push(...parsed.packages);
-    else if (parsed.kind === 'brew-formula') formulas.push(...parsed.packages);
-    else if (parsed.kind === 'apt') apt.push(...parsed.packages);
-    else winget.push(...parsed.packages);
   }
 
   const parts: string[] = [];

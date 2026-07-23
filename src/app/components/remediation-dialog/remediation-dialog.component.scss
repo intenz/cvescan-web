@@ -119,8 +119,19 @@
   color: var(--cves-text-dim);
 }
 
+.cves-rem-dialog__hint {
+  margin: 0.35rem 0 0;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--cves-text);
+}
+
 .cves-rem-dialog__cmd {
   margin-top: 0.45rem;
+
+  .cves-rem-dialog__hint + pre {
+    margin-top: 0.4rem;
+  }
 
   pre {
     margin: 0.25rem 0 0;

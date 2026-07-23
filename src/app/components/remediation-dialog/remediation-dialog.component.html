@@ -24,8 +24,9 @@
     </div>
 
     <p class="cves-rem-dialog__intro">
-      Update commands for curated products (Homebrew / apt / winget). Latest
-      versions are crawled from package indexes — not invented per CVE.
+      macOS GUI apps: update in the app first. Package-manager commands
+      (Homebrew / apt / winget) are copyable separately. Latest versions are
+      crawled from package indexes — not invented per CVE.
       @if (showCombined()) {
         Same-manager upgrades are merged into one command so you can update
         several apps in a single run.
@@ -84,20 +85,27 @@
           </p>
 
           @if (!showCombined()) {
-            @if (r.commands.macos) {
+            @if (r.commands.macos || r.macosHint) {
               <div class="cves-rem-dialog__cmd">
                 <div class="cves-rem-dialog__os">
                   <span>macOS</span>
-                  <button
-                    type="button"
-                    (click)="copyCmd(r.productId + ':macos', r.commands.macos)"
-                  >
-                    {{
-                      copiedKey === r.productId + ':macos' ? 'Copied' : 'Copy'
-                    }}
-                  </button>
+                  @if (r.commands.macos) {
+                    <button
+                      type="button"
+                      (click)="copyCmd(r.productId + ':macos', r.commands.macos)"
+                    >
+                      {{
+                        copiedKey === r.productId + ':macos' ? 'Copied' : 'Copy'
+                      }}
+                    </button>
+                  }
                 </div>
-                <pre>{{ r.commands.macos }}</pre>
+                @if (r.macosHint) {
+                  <p class="cves-rem-dialog__hint">{{ r.macosHint }}</p>
+                }
+                @if (r.commands.macos) {
+                  <pre>{{ r.commands.macos }}</pre>
+                }
               </div>
             }
             @if (r.commands.linux) {
@@ -132,6 +140,13 @@
                 <pre>{{ r.commands.windows }}</pre>
               </div>
             }
+          } @else if (r.macosHint) {
+            <div class="cves-rem-dialog__cmd">
+              <div class="cves-rem-dialog__os">
+                <span>macOS</span>
+              </div>
+              <p class="cves-rem-dialog__hint">{{ r.macosHint }}</p>
+            </div>
           }
         </li>
       }
