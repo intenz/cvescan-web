@@ -86,3 +86,13 @@ export function uniqueRemediations(cves: CveItem[]): RemediationPayload[] {
 export function hasRemediationCommands(r: RemediationPayload): boolean {
   return Boolean(r.commands.macos || r.commands.linux || r.commands.windows);
 }
+
+/** Show Remediation only when an update is available (not “up to date”). */
+export function needsRemediation(r: RemediationPayload): boolean {
+  return r.patchAvailable === true && hasRemediationCommands(r);
+}
+
+/** CVE row can open Remediation (tracked + update available + commands). */
+export function cveNeedsRemediation(cve: CveItem): boolean {
+  return cve.patch_available === true && Boolean(cve.remediation && needsRemediation(cve.remediation));
+}

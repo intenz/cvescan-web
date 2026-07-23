@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import {
-  hasRemediationCommands,
+  cveNeedsRemediation,
   uniqueRemediations,
   type CveItem,
   type RemediationPayload,
@@ -12,7 +12,7 @@ export class RemediationUiService {
   readonly items = signal<RemediationPayload[]>([]);
 
   show(cves: CveItem[]): void {
-    const items = uniqueRemediations(cves).filter(hasRemediationCommands);
+    const items = uniqueRemediations(cves.filter(cveNeedsRemediation));
     if (!items.length) return;
     this.items.set(items);
     this.open.set(true);

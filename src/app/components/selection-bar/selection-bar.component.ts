@@ -1,5 +1,5 @@
 import { Component, computed, inject } from '@angular/core';
-import { hasRemediationCommands, uniqueRemediations } from '../../core/models';
+import { cveNeedsRemediation } from '../../core/models';
 import { RemediationUiService } from '../../core/remediation-ui.service';
 import { ScanStateService } from '../../core/scan-state.service';
 
@@ -25,12 +25,9 @@ export class SelectionBarComponent {
     return { count: selected.length, critical, high, avg };
   });
 
-  readonly canRemediate = computed(() => {
-    const items = uniqueRemediations(this.state.selectedCves()).filter(
-      hasRemediationCommands,
-    );
-    return items.length > 0;
-  });
+  readonly canRemediate = computed(() =>
+    this.state.selectedCves().some(cveNeedsRemediation),
+  );
 
   openRemediation(): void {
     this.remUi.show(this.state.selectedCves());
