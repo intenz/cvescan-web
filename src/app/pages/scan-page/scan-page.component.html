@@ -43,18 +43,48 @@
   @if (state.isExample()) {
     <div class="cves-scan__banner">
       @if (state.mode() === 'browser') {
-        ◈ Catalog preview in our DB ({{ state.totalCount() }} CVEs) — enter a website URL to probe stack signals
+        ◈ Huge catalog of {{ state.totalCount() }} CVEs spanning 5+ years. Use search to find any CVE, or enter a website URL to probe stack signals
       } @else if (state.mode() === 'network') {
-        ◈ Catalog preview in our DB ({{ state.totalCount() }} CVEs) — upload nmap scan_results.xml to match exposed services
+        ◈ Huge catalog of {{ state.totalCount() }} CVEs spanning 5+ years. Use search to find any CVE, or upload a file to match your network
       } @else {
-        ◈ Catalog preview in our DB ({{ state.totalCount() }} CVEs) — upload scan_results.txt to see matches for your system
+        ◈ Huge catalog of {{ state.totalCount() }} CVEs spanning 5+ years. Use search to find any CVE, or upload a file to match your system
       }
     </div>
   } @else if (!state.isExample()) {
     <div class="cves-scan__banner cves-scan__banner--results">
       <span class="cves-scan__banner-text">
         @if (showDetectedBanner()) {
-          {{ detectedLabel() }}
+          <span>Checked {{ detectedCount() }} {{ detectedUnit() }} · {{ state.cves().length }} CVEs detected</span>
+          @if (unversionedCveCount() > 0) {
+            <span class="cves-scan__unreliable">
+              · {{ unversionedCveCount() }} Noise
+              <span
+                class="cves-scan__help"
+                tabindex="0"
+                (click)="$event.stopPropagation()"
+                (keydown)="$event.stopPropagation()"
+              >
+                <span class="cves-scan__help-mark" aria-hidden="true">?</span>
+                <span class="cves-scan__help-tip" role="tooltip">
+                  <span
+                    >CPE→CVE matching often finds CVEs with version
+                    <code>*</code> (any / unknown).</span
+                  >
+                  <span
+                    >NVD uses <code>*</code> when the exact affected version
+                    isn’t listed yet, or for broad product advisories.</span
+                  >
+                  <span
+                    >We still include them so you don’t miss new issues — but
+                    they may not apply to your installed build.</span
+                  >
+                </span>
+              </span>
+            </span>
+          }
+          @if (detectedExtra()) {
+            <span> · {{ detectedExtra() }}</span>
+          }
         } @else {
           Scan results
         }

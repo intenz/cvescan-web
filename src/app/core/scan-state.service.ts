@@ -3,6 +3,7 @@ import { isPlatformBrowser } from '@angular/common';
 import type { LiveFeedId, LiveFeedStatus } from './live-feeds';
 import {
   EXAMPLE_CVES,
+  hasConcreteCveVersion,
   type CveItem,
   type ScanMode,
   type ScanOs,
@@ -123,11 +124,14 @@ export class ScanStateService {
     if (!this.serverPaging() && filter !== 'ALL') {
       rows = rows.filter((c) => c.severity === filter);
     }
-    // 🔥 Patch = update available (patch_available === true), capped at 100.
-    // Catalog without search uses ?tracked=1 (server already keeps patch yes).
+    // 🔥 Patch = update available + concrete CVE version, capped at 100.
+    // Catalog without search uses ?tracked=1 (server already keeps patch yes + version).
     if (patchOnly && !this.serverPaging()) {
       rows = rows
-        .filter((c) => c.patch_available === true)
+        .filter(
+          (c) =>
+            c.patch_available === true && hasConcreteCveVersion(c.version),
+        )
         .slice(0, 100);
     }
     return rows;
@@ -142,7 +146,12 @@ export class ScanStateService {
     if (filter !== 'ALL') {
       rows = rows.filter((c) => c.severity === filter);
     }
-    return rows.filter((c) => c.patch_available === true).length > 100;
+    return (
+      rows.filter(
+        (c) =>
+          c.patch_available === true && hasConcreteCveVersion(c.version),
+      ).length > 100
+    );
   });
 
   readonly totalCount = computed(() =>

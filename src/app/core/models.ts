@@ -51,6 +51,14 @@ export function formatPatchLabel(
   return '—';
 }
 
+/** Concrete version on the CVE (not * / - / empty). */
+export function hasConcreteCveVersion(
+  version: string | null | undefined,
+): boolean {
+  const t = version?.trim();
+  return Boolean(t && t !== '*' && t !== '-');
+}
+
 export function formatPatchShort(
   patch: boolean | null | undefined,
   tracked = false,
