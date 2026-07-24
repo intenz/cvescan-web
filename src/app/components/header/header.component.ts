@@ -13,7 +13,6 @@ import type { ScanMode } from '../../core/models';
 import {
   LIVE_FEED_DEFINITIONS,
   formatFeedUpdatedAt,
-  liveFeedTooltip,
 } from '../../core/live-feeds';
 import { SCAN_MODES } from '../../core/seo-content';
 import { modePath } from '../../core/mode-path';
@@ -46,12 +45,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
   readonly feedIndex = signal(0);
   readonly activeFeed = computed(() => this.feedDefinitions[this.feedIndex()]);
   readonly liveLabel = computed(() => this.activeFeed().label);
-  readonly liveTooltip = computed(() =>
-    liveFeedTooltip(
-      this.activeFeed(),
-      this.state.feedLastUpdated()[this.activeFeed().id],
-    ),
-  );
   readonly liveUpdatedLabel = computed(() =>
     formatFeedUpdatedAt(this.state.feedLastUpdated()[this.activeFeed().id]),
   );
