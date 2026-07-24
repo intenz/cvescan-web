@@ -291,6 +291,8 @@ export class ScanStateService {
   }
 
   markCommandCopied(): void {
+    // Copying the command implies the current OS tab is the chosen one.
+    this.osPicked.set(true);
     this.commandCopied.set(true);
   }
 
