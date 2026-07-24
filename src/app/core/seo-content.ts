@@ -84,7 +84,7 @@ export const HOME_SEO = {
 export const EXTERNAL_API_SEO = {
   title: 'CVEScan External API — Commercial CPE → CVE Matching | cvescan.app',
   description:
-    'Batch-scan up to 10 inventory files, download CSV reports, or POST /match on api.cvescan.app. Bearer auth, CVSS & CISA KEV — docs on cvescan.app/external-api.',
+    'POST /match, GET /cve, and scan-batch (up to 10 files) on api.cvescan.app. Bearer auth, CVSS, CISA KEV, remediation payloads, CSV reports — docs on cvescan.app/external-api.',
   canonical: `${SITE_URL}/external-api`,
 };
 

@@ -1,11 +1,14 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { copyText } from '../../core/copy-text';
 import {
   EXTERNAL_API_BASE,
   EXTERNAL_API_BENEFITS,
   EXTERNAL_API_ENDPOINTS,
   EXTERNAL_API_ERRORS,
+  EXTERNAL_API_ROADMAP,
   EXTERNAL_API_SITE,
+  EXTERNAL_API_VS_PUBLIC,
   type ApiEndpointDoc,
   type CodeLang,
 } from '../../core/external-api-docs';
@@ -15,7 +18,7 @@ import { SeoService, applyPageSeo } from '../../core/seo.service';
 @Component({
   selector: 'cves-external-api-page',
   standalone: true,
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './external-api-page.component.html',
   styleUrl: './external-api-page.component.scss',
 })
@@ -27,6 +30,8 @@ export class ExternalApiPageComponent implements OnInit {
   readonly benefits = EXTERNAL_API_BENEFITS;
   readonly endpoints = EXTERNAL_API_ENDPOINTS;
   readonly errors = EXTERNAL_API_ERRORS;
+  readonly vsPublic = EXTERNAL_API_VS_PUBLIC;
+  readonly roadmap = EXTERNAL_API_ROADMAP;
   readonly exampleLang = signal<CodeLang>('curl');
   readonly copiedId = signal<string | null>(null);
 

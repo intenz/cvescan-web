@@ -5,7 +5,8 @@
     Ship the same matching engine that powers
     <a [href]="site">{{ site.replace('https://', '') }}</a>
     into your products, CI, and fleet agents. Map CPE identifiers or product/version
-    inventories to NVD CVEs with CVSS, CISA KEV, and enrichment — at integration scale.
+    inventories to NVD CVEs with CVSS, CISA KEV, enrichment, and remediation when available —
+    at integration scale.
   </p>
 
   <div class="cves-ext__banner" role="note">
@@ -21,6 +22,16 @@
     </a>
     <span class="cves-ext__cta-note">Email support&#64;cvescan.app — we issue keys for production use.</span>
   </div>
+
+  <h2 id="vs">Public scanner vs External API</h2>
+  <ul class="cves-ext__vs">
+    @for (row of vsPublic; track row.label) {
+      <li>
+        <h3>{{ row.label }}</h3>
+        <p>{{ row.body }}</p>
+      </li>
+    }
+  </ul>
 
   <h2 id="why">Why teams buy External API</h2>
   <ul class="cves-ext__benefits">
@@ -47,9 +58,9 @@
 
   <h2 id="reference">API reference</h2>
   <p class="cves-ext__muted">
-    The two endpoints that matter for most integrations. Samples use
-    <code>api.cvescan.app</code>. Full surface (health, single-CPE GET, CVE lookup)
-    is available after you get a key — ask support if you need those details.
+    Samples use <code>api.cvescan.app</code>. For Noise / Patch UX on the website, see the
+    <a routerLink="/faq">FAQ</a> — API responses use the same catalog fields
+    (<code>version</code>, <code>patch_available</code>, <code>remediation</code>).
   </p>
 
   <div class="cves-ext__lang" role="tablist" aria-label="Example language">
@@ -148,10 +159,9 @@
 
   <h2 id="roadmap">Commercial extras (roadmap)</h2>
   <ul class="cves-ext__list">
-    <li>Scheduled reporting webhooks and signed audit exports</li>
-    <li>Remediation / “how to resolve this CVE” guidance in the payload</li>
-    <li>Org-level usage dashboards on cvescan.app</li>
-    <li>Higher rate limits / org API keys for large fleets</li>
+    @for (item of roadmap; track item) {
+      <li>{{ item }}</li>
+    }
   </ul>
 
   <p class="cves-ext__note">
@@ -163,4 +173,9 @@
     <a href="mailto:support&#64;cvescan.app">support&#64;cvescan.app</a>
   </p>
 
+  <p class="cves-ext__back">
+    <a routerLink="/">← Back to scanner</a>
+    ·
+    <a routerLink="/faq">FAQ</a>
+  </p>
 </section>
