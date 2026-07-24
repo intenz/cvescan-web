@@ -91,10 +91,10 @@ export const EXTERNAL_API_SEO = {
 export const FAQ_SEO = {
   title: 'CVEScan FAQ — CPE → CVE Matching, Privacy & Scan Modes',
   description:
-    'Answers about CVEScan: how CPE to CVE matching works, uploading scan_results.txt safely, Local / Browser / Network modes, supported OS platforms, and NVD / VulnCheck / CISA KEV data.',
+    'Answers about CVEScan: CPE → CVE matching, Noise vs versioned hits, Patch & remediation, Local / Browser / Network uploads, privacy, and NVD / VulnCheck / CISA KEV data.',
   canonical: `${SITE_URL}/faq`,
   h1: 'Frequently asked questions',
-  lead: 'How CVEScan works, what data we use, and what happens when you upload an inventory file.',
+  lead: 'How CVEScan works, what Noise and Patch mean, and what happens when you upload an inventory file.',
 };
 
 /** Crawlable copy kept on the home page (visually hidden in UI). */
@@ -129,7 +129,7 @@ export const FAQ_ITEMS: FaqItem[] = [
   {
     question: 'How do I check installed programs for CVEs?',
     answer:
-      'Open CVEScan, choose Local Programs, pick your OS, copy the inventory command, and run it on your machine. That command only lists installed software and versions into scan_results.txt — it does not modify the system. Upload the file in the browser. We resolve each product to a CPE, match it against NVD, and show CVEs with CVSS severity so you can see what is unpatched.',
+      'Open CVEScan, choose Local Programs, pick your OS (or just Copy — the current OS tab is used), run the inventory command on your machine, then upload scan_results.txt. The command only lists installed software and versions — it does not modify the system. We resolve each product to a CPE, match it against NVD, and show CVEs with CVSS severity.',
   },
   {
     question: 'How does CPE to CVE matching work?',
@@ -144,7 +144,7 @@ export const FAQ_ITEMS: FaqItem[] = [
   {
     question: 'Can I scan Linux, Windows, and macOS packages for vulnerabilities?',
     answer:
-      'Yes. Local Programs currently supports inventory commands for macOS, Linux, Windows, iPhone, and Android. Each OS tab shows a read-only command tailored to that platform. After you upload the result, matching works the same way: installed software → CPE → CVE. Coverage depends on how well the product names/versions map into CPE and NVD data.',
+      'Yes. Local Programs currently supports inventory commands for macOS, Linux, Windows, iPhone (beta), and Android (later). Each OS tab shows a read-only command tailored to that platform. After you upload the result, matching works the same way: installed software → CPE → CVE. Coverage depends on how well the product names/versions map into CPE and NVD data.',
   },
   {
     question: 'What is a runtime CVE scanner?',
@@ -162,6 +162,16 @@ export const FAQ_ITEMS: FaqItem[] = [
       'Browser mode: enter a public website URL. CVEScan probes HTTP headers and HTML signals, then matches detected products to NVD CVEs. Network mode: run nmap `-sV -oX`, upload the XML, and match discovered services/products to CVEs. Local Programs remains the installed-software scan, including iPhone (beta).',
   },
   {
+    question: 'What does “Noise” mean in the results?',
+    answer:
+      'Noise marks CVEs matched without a concrete affected version (often version * in NVD). That happens when the advisory is broad or the exact version is not listed yet. We still show them so you do not miss new issues, but they may not apply to your installed build. If every match is Noise after a real scan, you are usually in good shape for version-specific hits.',
+  },
+  {
+    question: 'What is the Patch filter and Remediation?',
+    answer:
+      '🔥 Patch shows curated products where an update looks available (tracked apps/OS with a comparable version signal). Remediation opens update guidance: package-manager commands (Homebrew / apt / winget) when we have them, plus a macOS Applications hint for GUI apps found via system_profiler. Always review before running anything — brew only works if that app was installed with Homebrew.',
+  },
+  {
     question: 'Do I need an account or API key to use the website scanner?',
     answer:
       'No account is required for the public scanners: Local Programs (inventory upload), Browser (public URL), and Network (nmap XML). Pick a mode, follow the steps, and view matches. The External API is a separate commercial CPE → CVE matching interface for integrations and requires an API key. Contact support@cvescan.app if you need API access.',
@@ -169,12 +179,17 @@ export const FAQ_ITEMS: FaqItem[] = [
   {
     question: 'What file format should I upload?',
     answer:
-      'Upload a plain-text .txt file produced by the OS command shown in the UI (typically named scan_results.txt). The content should be a software inventory — package or app names with versions — not a binary installer or screenshot. If parsing fails, re-run the command for your OS tab and upload the fresh output.',
+      'Local Programs: a plain-text .txt inventory from the OS command (typically scan_results.txt) — package/app names with versions. Network: nmap XML from `nmap -oX` (scan_results.xml). Not a binary installer or screenshot. If parsing fails, re-run the command for your mode/OS and upload the fresh output.',
   },
   {
     question: 'Why might some installed programs show no CVEs?',
     answer:
       'No match can mean the product is not in NVD under a resolvable CPE, the version string could not be parsed, the name is too generic, or there are simply no published CVEs for that version. Try clearer product names when possible. Absence of results is not a guarantee the software is safe — it means we could not confidently map it in the current catalog.',
+  },
+  {
+    question: 'Is the home catalog the same as my scan results?',
+    answer:
+      'No. The home table is a preview of recent CVEs from the shared catalog (browsable by severity and search). Your upload or Browser/Network scan replaces that preview with matches for what was detected on your machine or target. Clear the scan banner to return to the catalog preview.',
   },
 ];
 
