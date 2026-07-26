@@ -522,10 +522,8 @@ export class ApiService {
     }
 
     const local: Record<ScanOs, string> = {
-      macos:
-        "system_profiler SPSoftwareDataType SPApplicationsDataType | grep -E 'Version:|^    [^ ].*:$' > scan_results.txt",
-      linux:
-        "dpkg-query -W -f='${Package} ${Version}\\n' > scan_results.txt 2>/dev/null || rpm -qa > scan_results.txt",
+      macos: 'brew list --versions > scan_results.txt',
+      linux: 'brew list --versions > scan_results.txt',
       windows:
         'winget list --accept-source-agreements | Out-File -FilePath "$env:USERPROFILE\\scan_results.txt" -Encoding utf8',
       iphone:

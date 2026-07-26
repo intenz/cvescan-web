@@ -169,7 +169,7 @@ export const FAQ_ITEMS: FaqItem[] = [
   {
     question: 'What is the Patch filter and Remediation?',
     answer:
-      '🔥 Patch shows curated products where an update looks available (tracked apps/OS with a comparable version signal). Remediation opens update guidance: package-manager commands (Homebrew / apt / winget) when we have them, plus a macOS Applications hint for GUI apps found via system_profiler. Always review before running anything — brew only works if that app was installed with Homebrew.',
+      '🔥 Patch shows curated products where an update looks available (tracked apps/OS with a comparable version signal). Remediation opens update guidance: package-manager commands (Homebrew / apt / winget) when we have them, plus a macOS Applications hint for GUI apps. Always review before running anything — brew only works if that app was installed with Homebrew.',
   },
   {
     question: 'Do I need an account or API key to use the website scanner?',
