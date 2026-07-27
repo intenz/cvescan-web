@@ -522,8 +522,10 @@ export class ApiService {
     }
 
     const local: Record<ScanOs, string> = {
-      macos: 'brew list --versions > scan_results.txt',
-      linux: 'brew list --versions > scan_results.txt',
+      macos:
+        '{ brew list --versions --formula; brew list --versions --cask; } > scan_results.txt 2>/dev/null',
+      linux:
+        '{ brew list --versions --formula; brew list --versions --cask; } > scan_results.txt 2>/dev/null',
       windows:
         'winget list --accept-source-agreements | Out-File -FilePath "$env:USERPROFILE\\scan_results.txt" -Encoding utf8',
       iphone:
@@ -545,6 +547,9 @@ export class ApiService {
     }
     if (os === 'android') {
       return 'Phone must be connected by USB. Then run the command and upload scan_results.txt';
+    }
+    if (mode === 'local' && (os === 'macos' || os === 'linux')) {
+      return 'Requires Homebrew (brew.sh). Run as a normal user — not sudo/root → upload scan_results.txt';
     }
     return 'Run the command, then upload scan_results.txt';
   }
