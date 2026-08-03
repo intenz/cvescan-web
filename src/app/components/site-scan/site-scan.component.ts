@@ -3,11 +3,12 @@ import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../core/api.service';
 import { ScanStateService } from '../../core/scan-state.service';
 import { DownloadReportComponent } from '../download-report/download-report.component';
+import { AiAssistButtonComponent } from '../ai-assist-button/ai-assist-button.component';
 
 @Component({
   selector: 'cves-site-scan',
   standalone: true,
-  imports: [FormsModule, DownloadReportComponent],
+  imports: [FormsModule, DownloadReportComponent, AiAssistButtonComponent],
   templateUrl: './site-scan.component.html',
   styleUrl: './site-scan.component.scss',
 })

@@ -438,6 +438,50 @@ export class ApiService {
       );
   }
 
+  /** Post-scan AI chat (Gemini) grounded in matched CVEs / CPEs. */
+  askAssist(
+    messages: Array<{ role: 'user' | 'assistant'; content: string }>,
+    cves: CveItem[],
+    apiKey: string,
+  ): Observable<string> {
+    const payload = {
+      apiKey: apiKey.trim(),
+      messages,
+      cves: cves.slice(0, 500).map((c) => ({
+        cve_id: c.cve_id,
+        title: c.title,
+        description: (c.description || '').slice(0, 500),
+        severity: c.severity,
+        cvss: c.cvss,
+        product: c.product,
+        version: c.version,
+        kev: c.kev,
+        matched_cpes: (c.matched_cpes ?? []).slice(0, 8),
+        affected_cpes: (c.affected_cpes ?? []).slice(0, 8),
+      })),
+    };
+    return this.http
+      .post<{ reply: string }>(`${this.base}/api/customer/assist`, payload, {
+        headers: this.headers(),
+      })
+      .pipe(
+        map((res) => res.reply),
+        catchError((err: {
+          status?: number;
+          message?: string;
+          error?: { error?: { message?: string; code?: string } };
+        }) => {
+          const apiMsg = err?.error?.error?.message;
+          const msg =
+            err?.status === 429
+              ? 'Too many requests — try again in a minute'
+              : apiMsg || 'AI assistant failed — try again';
+          // Don't Object.assign(HttpErrorResponse) — it overwrites Error.message.
+          throw new Error(msg);
+        }),
+      );
+  }
+
   /** Shared copy when customer scan endpoints return HTTP 429. */
   private scanLimitOr(err: { status?: number } | null | undefined, fallback: string): string {
     if (err?.status === 429) {

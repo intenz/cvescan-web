@@ -1,0 +1,105 @@
+<div
+  class="cves-ai-dialog"
+  role="presentation"
+  (click)="onBackdrop($event)"
+>
+  <div
+    #panel
+    class="cves-ai-dialog__panel"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="cves-ai-title"
+    tabindex="-1"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="cves-ai-dialog__top">
+      <h2 id="cves-ai-title">AI Assistant · Gemini</h2>
+      <button
+        type="button"
+        class="cves-ai-dialog__close"
+        aria-label="Close"
+        (click)="close()"
+      >
+        ×
+      </button>
+    </div>
+
+    <p class="cves-ai-dialog__intro">
+      Uses <strong>your</strong> Gemini API key (BYOK). Key stays in this browser
+      only — CVEScan does not store it.
+      <a
+        href="https://aistudio.google.com/apikey"
+        target="_blank"
+        rel="noopener noreferrer"
+        >Get a free key →</a
+      >
+    </p>
+
+    <label class="cves-ai-dialog__key">
+      <span>Gemini API key</span>
+      <input
+        type="text"
+        name="geminiKey"
+        autocomplete="off"
+        autocapitalize="off"
+        autocorrect="off"
+        spellcheck="false"
+        data-lpignore="true"
+        data-1p-ignore="true"
+        data-bwignore="true"
+        data-form-type="other"
+        placeholder="Paste key from Google AI Studio"
+        [ngModel]="apiKey()"
+        [ngModelOptions]="{ standalone: true }"
+        (ngModelChange)="onApiKeyChange($event)"
+        [disabled]="busy()"
+      />
+    </label>
+
+    <div #thread class="cves-ai-dialog__thread" aria-live="polite">
+      @for (m of messages(); track $index) {
+        <div
+          class="cves-ai-dialog__bubble"
+          [class.is-user]="m.role === 'user'"
+          [class.is-bot]="m.role === 'assistant'"
+        >
+          <span class="cves-ai-dialog__who">{{
+            m.role === 'user' ? 'You' : 'Assistant'
+          }}</span>
+          <p>{{ m.content }}</p>
+        </div>
+      }
+      @if (busy()) {
+        <div class="cves-ai-dialog__bubble is-bot is-pending">
+          <span class="cves-ai-dialog__who">Assistant</span>
+          <p>Thinking…</p>
+        </div>
+      }
+    </div>
+
+    @if (error(); as err) {
+      <p class="cves-ai-dialog__error">{{ err }}</p>
+    }
+
+    <div class="cves-ai-dialog__composer">
+      <textarea
+        rows="2"
+        name="draft"
+        [ngModel]="draft()"
+        [ngModelOptions]="{ standalone: true }"
+        (ngModelChange)="draft.set($event)"
+        [disabled]="busy()"
+        placeholder="Type a question, then press Send…"
+        (keydown)="onComposerKeydown($event)"
+      ></textarea>
+      <button
+        type="button"
+        [disabled]="!canSend()"
+        [title]="sendHint()"
+        (click)="send()"
+      >
+        {{ busy() ? '…' : 'Send' }}
+      </button>
+    </div>
+  </div>
+</div>

@@ -3,11 +3,12 @@ import { ApiService } from '../../core/api.service';
 import { ScanStateService } from '../../core/scan-state.service';
 import { UPLOAD_STAGES } from '../../core/ui-motion';
 import { DownloadReportComponent } from '../download-report/download-report.component';
+import { AiAssistButtonComponent } from '../ai-assist-button/ai-assist-button.component';
 
 @Component({
   selector: 'cves-upload-zone',
   standalone: true,
-  imports: [DownloadReportComponent],
+  imports: [DownloadReportComponent, AiAssistButtonComponent],
   templateUrl: './upload-zone.component.html',
   styleUrl: './upload-zone.component.scss',
 })

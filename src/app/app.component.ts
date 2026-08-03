@@ -5,10 +5,12 @@ import { CopyrightComponent } from './components/copyright/copyright.component';
 import { DataSourcesDialogComponent } from './components/data-sources-dialog/data-sources-dialog.component';
 import { DonateDialogComponent } from './components/donate-dialog/donate-dialog.component';
 import { RemediationDialogComponent } from './components/remediation-dialog/remediation-dialog.component';
+import { AiAssistDialogComponent } from './components/ai-assist-dialog/ai-assist-dialog.component';
 import { HeaderComponent } from './components/header/header.component';
 import { ThemeService } from './core/theme.service';
 import { AnalyticsService } from './core/analytics.service';
 import { ApiService } from './core/api.service';
+import { AiAssistUiService } from './core/ai-assist-ui.service';
 import { DataSourcesUiService } from './core/data-sources-ui.service';
 import { DonateUiService } from './core/donate-ui.service';
 import { RemediationUiService } from './core/remediation-ui.service';
@@ -24,6 +26,7 @@ import { ScanStateService } from './core/scan-state.service';
     DataSourcesDialogComponent,
     DonateDialogComponent,
     RemediationDialogComponent,
+    AiAssistDialogComponent,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
@@ -37,6 +40,7 @@ export class AppComponent implements OnInit {
   readonly dataSources = inject(DataSourcesUiService);
   readonly donate = inject(DonateUiService);
   readonly remediation = inject(RemediationUiService);
+  readonly aiAssist = inject(AiAssistUiService);
 
   constructor() {
     // Keep command text aligned with the active mode + OS tabs (header is global).

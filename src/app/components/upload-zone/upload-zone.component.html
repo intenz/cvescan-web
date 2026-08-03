@@ -20,6 +20,7 @@
     </label>
     @if (canDownload()) {
       <cves-download-report />
+      <cves-ai-assist-button />
     } @else {
       <p class="cves-upload__format">
         @if (isNetwork()) {

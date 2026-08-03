@@ -12,3 +12,6 @@
 @if (remediation.open()) {
   <cves-remediation-dialog (closed)="remediation.hide()" />
 }
+@if (aiAssist.open()) {
+  <cves-ai-assist-dialog (closed)="aiAssist.hide()" />
+}
