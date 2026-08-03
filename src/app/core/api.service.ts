@@ -473,8 +473,9 @@ export class ApiService {
         }) => {
           const apiMsg = err?.error?.error?.message;
           const msg =
-            err?.status === 429
-              ? 'Too many requests — try again in a minute'
+            err?.status === 429 || err?.status === 503
+              ? apiMsg ||
+                'Google Gemini free API is overloaded — wait a minute and try again'
               : apiMsg || 'AI assistant failed — try again';
           // Don't Object.assign(HttpErrorResponse) — it overwrites Error.message.
           throw new Error(msg);
